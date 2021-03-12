@@ -1,0 +1,47 @@
+# Set up the systems in the Snakefile itself
+
+
+SYSTEMS: "config/systems.tsv"
+EDAVALS: "config/EDAvalues.tsv"
+
+#---------------------------------- Overall ----------------------------------#
+
+# Project identifier
+# Files will be written as {PROJ_TAG}{F_SEP}{SYS}
+#  (sometimes {PROJ_TAG}{F_SEP}{SYS}{F_SEP}{REP})
+# If you value consistency, make sure you use the same F_SEP here
+PROJ_TAG: "ProteinID"
+
+F_SEP: "_" # underscore
+#F_SEP: "-" # dash
+
+# Project pre-extension (optional)
+# This is in case you add something like a solvent label to your files
+# So you can have {PROJ_TAG}{F_SEP}{SYS}{PROJ_EPE}
+# NOTE: Because this is optional, you need to add the appropriate
+# filename separator here
+# Ex:
+# PROJ_TAG = crambin, F_SEP = _, SYS = WT, PROJ_PE = _wat
+# creates the prmtop: crambin_WT_wat.prmtop
+# Using "" for PROJ_PE would instead give `crambin_WT.prmtop`
+#PROJ_PE: "_wat"
+PROJ_PE: "" # Use for none
+
+# The name of the PBS queue
+QUEUE: "my_cpu_alloc"
+
+# The extension used for the current trajectory files
+# Include this because we have a tendency to use mdcrd for nc files but
+# you might change to the right ones in your later projects...
+CUR_TRAJ_EXT: "mdcrd"
+
+# The residue ranges for the standard cpptraj analysis. (ex: protein 1-455)
+START_RES_RANGE: "1"
+END_RES_RANGE: "392"
+
+# The production frames for the trajectory labels (ex: 25-350 as ns)
+START_PROD_RANGE: "25"
+END_PROD_RANGE: "350"
+
+# TODO: Add SLURM script option
+# TODO: Add LSF script option

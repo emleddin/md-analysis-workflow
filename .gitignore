@@ -1,0 +1,6 @@
+# Annoying MacOS File
+.DS_Store
+
+# Get rid of logs if you test here
+.snakemake
+
