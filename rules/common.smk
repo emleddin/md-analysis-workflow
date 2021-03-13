@@ -1,9 +1,12 @@
 # https://stackoverflow.com/questions/58848521/how-to-use-dict-value-and-key-in-snakemake-rules
 # [f"{key}/{value[3]}_file.txt" for key, values in systems.items() for value in values]
 
-# Remove all files made in by workflow
-# Do NOT use if you care about input files and the like.
+
 rule clean:
+#! clean            : Removes all the files made by the workflow.
+#!                    Do NOT use this if you care about input files or the
+#!                    concatenated trajectories!
+#!
     run:
         # Properly select the analysis paths without using a wildcard
         # for key, values in systems.items():

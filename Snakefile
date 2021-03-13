@@ -53,6 +53,10 @@ include: "rules/hba.smk"
 include: "rules/cpptraj.smk"
 
 rule all:
+# Denote rule help with `#!` at start of line to find with grep later.
+# Include a final `#!` after all explanation for readability.
+#! all              : Builds all analysis files and runs all analyses.
+#!
     input:
         # `systems`
         # Key = the output path
@@ -121,4 +125,26 @@ rule all:
          key, values in systems.items() for value in values],
         # Normal Modes
         [f"analysis/NMA/{tag}{fs}{value[0]}{fs}{value[1]}{fs}NMA.png" for
-         key, values in systems.items() for value in values],
+         key, values in systems.items() for value in values]
+
+
+rule help:
+#! help             : Prints help comments for the workflow rules.
+#!
+    params:
+        # Create fencing around the help for readability
+        start = " -----------------             All Workflow Rules             -----------------\n",
+        s1 = " Hello! If you are looking for more help than what the commands are,\n",
+        s2 = " I sincerely hope you will consider reading the README.md file. It contains\n",
+        s3 = " a lot of specific information for working with this workflow.\n",
+        s4 = " Good luck, and research on!\n\n",
+        end = "\n ................. __/\_/\_/\" ...thems the rules... \"\_/\_/\__ ................\n"
+    shell:
+        """
+        echo '{params.start}'
+        echo '{params.s1}' '{params.s2}' '{params.s3}' '{params.s4}'
+        grep -h '^#!' Snakefile
+        grep -h '^#!' rules/*smk
+        echo '{params.end}'
+        """
+

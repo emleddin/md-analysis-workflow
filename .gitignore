@@ -4,3 +4,6 @@
 # Get rid of logs if you test here
 .snakemake
 
+# I think this relates to PyCharm
+.idea/
+

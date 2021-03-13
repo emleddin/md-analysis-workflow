@@ -2,6 +2,8 @@
 #            Run cpptraj  2           #
 #-------------------------------------#
 rule cpptraj_analysis:
+#! cpptraj_analysis : Runs the analysis with cpptraj using the generated script.
+#!
     input:
         # [f"analysis/{sys_rep_dir}/cpptraj{fs}strip.sh" for sys_rep_dir, values in
         #  systems.items() for value in values],
@@ -48,6 +50,10 @@ rule cpptraj_analysis:
 #            Run cpptraj  1           #
 #-------------------------------------#
 rule cpptraj_strip:
+#! cpptraj_strip    : Writes the non-autoimaged/stripped trajectory in ASCII
+#!                    for EDA and creates the autoimaged/stripped trajectory
+#!                    for further analysis.
+#!
     input:
         sh = [f"analysis/{sys_rep_dir}/cpptraj{fs}strip.sh" for
               sys_rep_dir, values in systems.items() for value in values],
@@ -71,8 +77,11 @@ rule cpptraj_strip:
 #-------------------------------------#
 #             Write cpptraj           #
 #-------------------------------------#
-# This one works but gives a target error
 rule cpptraj_write:
+#! cpptraj_write    : Runs a python3 script for generating the input files for
+#!                    cpptraj based on the file naming specifics in the
+#!                    `config/config.yaml` file.
+#!
     input:
         script = "scripts/write-cpptraj.py"
     output:

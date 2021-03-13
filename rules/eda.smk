@@ -2,9 +2,9 @@
 #              EDA Files              #
 #-------------------------------------#
 rule eda_run:
-    """
-    
-    """
+#! eda_run          : Submits the script for running the EDA Fortran program
+#!                    to the queue scheduler.
+#!
     input:
         script = [f"analysis/EDA/{sys_rep_dir}/EDA{fs}job.sh" for
          sys_rep_dir, values in systems.items() for value in values],
@@ -38,7 +38,13 @@ rule eda_run:
         shell("qsub {input.script}")
 
 rule eda_copy:
+#! eda_copy         : Copies the `prmtop` file and Fortran 90 program to the
+#!                    to the system/replicate subdirectory in preparation of
+#!                    running the EDA program.
+#!
     input:
+    # Copy the fortran program file from the scripts directory as part of a rule
+    # in case you run into issues that require changes to the program code
         prm = [f"{value[2]}/{tag}{fs}{value[0]}{post_e}.prmtop" for
          sys_rep_dir, values in systems.items() for value in values],
         fort = "scripts/Residue_E_Decomp_openmp.f90"
@@ -52,6 +58,10 @@ rule eda_copy:
         shell("cp {input.fort} {output.fort}")
 
 rule eda_write:
+#! eda_write        : Runs a python3 script for generating the input files for
+#!                    EDA based on the file naming specifics in the
+#!                    `config/config.yaml` file.
+#!
     input:
         script = "scripts/write-EDA.py",
         # mdcrd = [f"analysis/EDA/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}{p1}-{p2}.mdcrd" for
