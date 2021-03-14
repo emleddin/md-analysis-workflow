@@ -2,37 +2,54 @@
 
 [![Snakemake](https://img.shields.io/badge/snakemake-%E2%89%A56.0.0-blueviolet.svg?style=flat)](https://snakemake.readthedocs.io)
 
-This repository is a 
-[Snakemake](https://snakemake.readthedocs.io/en/stable/index.html) 
+This repository is a
+[Snakemake](https://snakemake.readthedocs.io/en/stable/index.html)
 workflow for working with AMBER MD analysis.
 
-You will need to 
+You will need to
 [install `snakemake`](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
-with Python 3.x for your system. 
+with Python 3.x for your system.
 Different components of this workflow also require an installation of R.
 
-Currently, the `Residue_E_Decomp_openmp.f90` in the `scripts/` directory is a 
+Currently, the `Residue_E_Decomp_openmp.f90` in the `scripts/` directory is a
 blank file for testing.
-You can download the actual script from 
+You can download the actual script from
 the [Cisneros Group's GitHub](https://github.com/CisnerosResearch/AMBER-EDA).
 
 The base directory is the entry point for this workflow.
 - `analysis`: contains the output from analyses.
-- `config`: configuration files. 
+- `config`: configuration files.
   The `.tsv` files should be used to give the workflow a "map" of your directory
   tree.
 - `rules`: contains the rules for `snakemake` and any required function
   definitions.
-- `scripts`: the base scripts that generate system-specific scripts. 
+- `scripts`: the base scripts that generate system-specific scripts.
   This is where you would modify specific analyses or figure-rendering.
-  They are written to take system arguments for the things specified in the 
+  They are written to take system arguments for the things specified in the
   `config/config.yaml` file that would be unique for a given project.
 
 It is recommended that you use the
 [PyCharm (Community)](https://www.jetbrains.com/pycharm/download/) IDE
-when editing these files, and adding the recommended plugins for Snakemake and 
+when editing these files, and adding the recommended plugins for Snakemake and
 TSV files.
 This will make debugging way, way easier!
+
+
+## What To Install
+
+Following the `snakemake` recommendations, you should set up a `conda`
+environment.
+```bash
+# Create a new environment named `snakemake` and install `snakemake` into it
+$ conda -n snakemake snakemake
+# Activate the environment
+$ conda activate snakemake
+# Install the packages needed for plotting scripts
+$ conda install matplotlib
+$ conda install prody
+$ conda install statsmodels
+```
+
 
 ## Using Snakemake
 You can use `snakemake -np` as a dry-run.
@@ -73,8 +90,8 @@ snakemake cpptraj_write --delete-all-output --cores 1
 
 This particular workflow has a `clean` rule, which will remove the previous
 analyses.
-Be careful, though, as this will remove any generated input scripts or 
-trajectory files. 
+Be careful, though, as this will remove any generated input scripts or
+trajectory files.
 You can rewrite the rule for yourself in `rules/common.smk`.
 ```
 snakemake clean --cores 1
@@ -87,12 +104,12 @@ The `config` directory contains 3 files:
   to set up the files for Energy Decomposition Analysis (EDA). Keep the header!
 These columns include:
     - `Path`: The path within the analysis tree where the files should be saved.
-      A typical path should look like `System/replicate`. This block 
+      A typical path should look like `System/replicate`. This block
       **must match** the `Path` specified in `systems.tsv`.
     - `NRES`: The number of non-solvent residues that you want to look at for
       the EDA. (Ex: 455)
     - `NATOM`: The total number of atoms in the trajectory. (Ex: 51348)
-    - `NPROTAT`: The number of atoms in the non-solvent portion of residues 
+    - `NPROTAT`: The number of atoms in the non-solvent portion of residues
       selected in `NRES`. (Ex: 5880)
     - `TOTRES`: The number of total residues in the trajectory. (Ex: 20348)
 
@@ -100,38 +117,38 @@ These columns include:
 the system will need to be converted to a PDB to determine `NRES` and `TOTRES`.
 
 - `systems.tsv`: a tab separated file with 5 columns of information necessary
-  to set up the file paths for various analyses. This is effectively a roadmap 
+  to set up the file paths for various analyses. This is effectively a roadmap
   for the directory tree. Keep the header!
   - `Path`: The path within the analysis tree where the files should be saved.
-      A typical path should look like `System/Replicate`. This block 
+      A typical path should look like `System/Replicate`. This block
       **must match** the `Path` specified in `EDAvalues.tsv`.
-    
+
     (Ex: `WT_r1`)
-    
-  - `System`: The system that the analysis is being performed on. 
+
+  - `System`: The system that the analysis is being performed on.
     This should match the first part of `Path` (prior to the slash).
-    An example of different systems would be `WT`, `MUTA`, and `MUTB`. 
-    
+    An example of different systems would be `WT`, `MUTA`, and `MUTB`.
+
     (Ex: `WT`)
 
-  - `Replicate`: The replicate. 
-    For the R-based EDA rules, particularly, you need at least 3 replicates. 
+  - `Replicate`: The replicate.
+    For the R-based EDA rules, particularly, you need at least 3 replicates.
     This should match the second part of `Path` (after the slash).
-    
+
     (Ex: `r1`)    
 
   - `Parm_Path`: The full system path to the trajectory files for a particular
-    `System/Replicate`. 
-    The `prmtop`, `inpcrd`, and `nc` or `mdcrd` files should be in the same 
-    directory. 
-    
+    `System/Replicate`.
+    The `prmtop`, `inpcrd`, and `nc` or `mdcrd` files should be in the same
+    directory.
+
     (Ex: `/home/$USER/project/system/replicate`)
-    
-  - `Sys_Tag`: The "tag" for files written in a shared directory that 
-    distinguishes one system type from another. 
-    Typically, this will look like a combination of the `PROJ_ID` specified in 
-    the `config/config.yaml` and the `System`. 
-    
+
+  - `Sys_Tag`: The "tag" for files written in a shared directory that
+    distinguishes one system type from another.
+    Typically, this will look like a combination of the `PROJ_ID` specified in
+    the `config/config.yaml` and the `System`.
+
     (Ex: `ProteinID_WT`)
 
 
@@ -146,14 +163,14 @@ the system will need to be converted to a PDB to determine `NRES` and `TOTRES`.
 
 
 - Inpcrd: `{tag}{fs}{system}{post_e}.inpcrd`
-  - Ex reps 1: crambin-WT-wat.inpcrd, crambin-H39C-wat.inpcrd 
+  - Ex reps 1: crambin-WT-wat.inpcrd, crambin-H39C-wat.inpcrd
   - Ex reps 2: crambin_WT.inpcrd, crambin_H39C.inpcrd
 
 
 - Traj (mdcrd/nc): `{tag}{fs}{system}{post_e}{fs}md{num}.{f_ext}`
   - Ex reps 1: crambin-WT-wat-md50.mdcrd, crambin-H39C-wat-md50.mdcrd
   - Ex reps 2: crambin_WT_md50.nc, crambin_H39C_md50.nc
-  
+
 | Variable      | Explanation                                                          |
 | ------------- |----------------------------------------------------------------------|
 | `tag`         | The project identifier for a file, to keep things findable.          |
@@ -165,14 +182,14 @@ the system will need to be converted to a PDB to determine `NRES` and `TOTRES`.
 
  Basically, don't interchange between the examples.
  If you did, you'll want to rename all your files SAFELY.
- Do NOT think *"oh this loop is safe"* without testing it **AWAY** from your 
- data first!!! 
- You may think it'll work fine, but that's a really easy way to overwrite or 
+ Do NOT think *"oh this loop is safe"* without testing it **AWAY** from your
+ data first!!!
+ You may think it'll work fine, but that's a really easy way to overwrite or
  delete your data in 10 seconds.
 
 The `rename` command (which doesn't exist in all systems...) can be useful
 for doing this.
-It takes the current naming you want to switch, the thing you want to switch 
+It takes the current naming you want to switch, the thing you want to switch
 it to, and the files it should be applied to as arguments.
 
 ```bash
@@ -195,13 +212,13 @@ proteinID-WT-wat-md1.nc  proteinID-WT-wat-md3.nc
 
 Part of what this workflow does is build the specific queue submission scripts
 for each job, since each job type has different needs.
-While `snakemake` can run through a cluster system, this approach seemed ideal 
+While `snakemake` can run through a cluster system, this approach seemed ideal
 when dealing with specific workflow rules, especially those pertaining to EDA.
-However, because of this atypical approach to snakemake, we want to set the 
-`output-wait` flag so that it knows that it might take a while for certain 
+However, because of this atypical approach to snakemake, we want to set the
+`output-wait` flag so that it knows that it might take a while for certain
 jobs to run.
 This may backfire!
-If you don't see any other jobs in the queue from the snakemake job for a 
+If you don't see any other jobs in the queue from the snakemake job for a
 few minutes, you may want to end the job and investigate.
 
 Similarly, because interactive jobs are dependent on the VPN, we can submit
@@ -239,28 +256,28 @@ snakemake --cores 1 --output-wait 7200
 ### Python
 - Cite [`snakemake`](https://snakemake.readthedocs.io/en/stable/project_info/citations.html)
   for their powerhouse software
-- Cite [`pandas`](https://pandas.pydata.org/about/citing.html) for their 
+- Cite [`pandas`](https://pandas.pydata.org/about/citing.html) for their
   beautiful TSV reading functions
 - Cite [`numpy`](https://numpy.org/citing-numpy/) for all things math
-- Cite [`matplotlib`](https://matplotlib.org/stable/citing.html) for the 
+- Cite [`matplotlib`](https://matplotlib.org/stable/citing.html) for the
   figures it helped make
-- Cite [`statsmodels`](https://www.statsmodels.org/stable/index.html#citation) 
+- Cite [`statsmodels`](https://www.statsmodels.org/stable/index.html#citation)
   for their hand in the matrix correlation figures
-- Cite [`prody`](http://prody.csb.pitt.edu/manual/about/citing.html) for 
+- Cite [`prody`](http://prody.csb.pitt.edu/manual/about/citing.html) for
   doing the normal mode analysis
 
 ### R
 - Cite [`R`](https://cran.r-project.org/) itself for existing in the world
-- Cite [`tidyverse`](https://tidyverse.tidyverse.org/authors.html) for 
+- Cite [`tidyverse`](https://tidyverse.tidyverse.org/authors.html) for
   changing the game of data table processing
-- Cite [`data.table`](https://cran.r-project.org/package=data.table) for 
+- Cite [`data.table`](https://cran.r-project.org/package=data.table) for
   reading EDA data with ease
-- Cite [`abind`](https://cran.r-project.org/package=abind) for helping to 
+- Cite [`abind`](https://cran.r-project.org/package=abind) for helping to
   process the EDA data
 
 ### Other
-- The `Residue_E_Decomp_openmp.f90` program (an empty file here to check the 
-  workflow) can be downloaded from the 
+- The `Residue_E_Decomp_openmp.f90` program (an empty file here to check the
+  workflow) can be downloaded from the
   [Cisneros Group's GitHub](https://github.com/CisnerosResearch/AMBER-EDA).
   The citation information is shared there.
 

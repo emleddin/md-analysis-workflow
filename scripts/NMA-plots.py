@@ -3,33 +3,49 @@ import prody as prd
 import matplotlib.pyplot as plt
 import sys
 
-in_file = sys.argv[0]
-out_file = sys.argv[1]
-num_of_modes = sys.argv[2]
+# The script itself is sys.argv[0]
+in_file = sys.argv[1]
+out_file = sys.argv[2]
+num_of_modes = int(sys.argv[3])
 
 
 def plot_ticks(NMA_data):
-    """Sets top xticks. You NEED the 0 and NMA_data.numAtoms(), otherwise the
-    scale will be turned off.
+    """Sets top xticks on the NMA plot.
+
+    Params
+    ------
+    NMA_data : prody.dynamics.nma.NMA
+        Normal mode data.
+
+    Notes
+    -----
+    You NEED the 0 and NMA_data.numAtoms(), otherwise the scale will be turned
+    off.
     """
-    labels_top = ["", "GS linker", "", "H1881R", "DNA", ""]
-    places_top = [0, 334, 346, 386, 431, NMA_data.numAtoms()]
+    labels_top = ["", "MUTA", "GS linker", "", "DNA", ""]
+    places_top = [0, 141, 334, 346, 431, NMA_data.numAtoms()]
     return labels_top, places_top
 
 
 def NMA_plots(filename, outfile):
     """Creates a plot of the most important modes for a system.
-        Parameters
-        ----------
-        filename : str
-            An NMD file.
-        outfile: str
-            Name of the output PNG.
-        """
+    Parameters
+    ----------
+    filename : str
+        An NMD file.
+    outfile: str
+        Name of the output PNG.
+
+    Returns
+    -------
+    outfile : png
+        The rendered normal mode plot.
+    """
     NMA_data, Atom_Group = prd.parseNMD(filename)
     eigens = NMA_data.getEigvals()
 
-    labels_top, places_top = plot_ticks(NMA_data)
+    # If you have specific X-tick labels, set them up in plot_ticks
+    #labels_top, places_top = plot_ticks(NMA_data)
 
     scales = []
     temp = open(filename)

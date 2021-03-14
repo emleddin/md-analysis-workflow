@@ -14,7 +14,12 @@ rule mc:
         pic = [f"analysis/MatCorr/{tag}{fs}{value[0]}{fs}{value[1]}{fs}mat{fs}corr.png" for
          key, values in systems.items() for value in values]
     run:
-        shell("python3 {input.script} {input.file} {output.pic}")
+        for key, values in systems.items():
+            for value in values:
+                shell("""
+                python3 {input.script} \
+analysis/{key}/{tag}{fs}{value[0]}{fs}corr{fs}mat.dat \
+analysis/MatCorr/{tag}{fs}{value[0]}{fs}{value[1]}{fs}mat{fs}corr.png""")
 
 
 #-------------------------------------#
@@ -33,4 +38,9 @@ rule nma:
         pic = [f"analysis/NMA/{tag}{fs}{value[0]}{fs}{value[1]}{fs}NMA.png" for
          key, values in systems.items() for value in values]
     run:
-        shell("python3 {input.script} {input.file} {output.pic} 4")
+        for key, values in systems.items():
+            for value in values:
+                shell("""
+                python3 {input.script} \
+analysis/{key}/{tag}{fs}{value[0]}{fs}100.nmd \
+analysis/NMA/{tag}{fs}{value[0]}{fs}{value[1]}{fs}NMA.png 4""")
