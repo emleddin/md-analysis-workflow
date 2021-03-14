@@ -27,6 +27,30 @@ out_analy = ('cpptraj'+str(fs)+'analysis.in')
 
 
 def write_strip_bash(outfile, queue, rep, f_path, cpp_strip, tag):
+    """Creates the PBS script for submitting cpptraj strip jobs.
+
+    Parameters
+    ----------
+    outfile : str
+        The name of the output file.
+    queue : str
+        The name of the queue to submit the job through.
+    rep : str
+        The replicate the job is for.
+    f_path: str
+        The full path to the trajectory files, for finding the prmtop.
+    cpp_strip : str
+        The name of the cpptraj strip file that will be submitted.
+    tag : str
+        The tag used in the file names. This should be comprised of
+        the project ID and system.
+
+    Returns
+    -------
+    outfile : txt
+        The written file containing PBS script for submitting the cpptraj
+        strip job.
+    """
     f = open(outfile, "w+")
     f.write("#!/bin/bash\n")
     f.write(f"#PBS -q {queue}\n")
@@ -60,6 +84,28 @@ def write_strip_traj(outfile, file_sep, f_path, tag, f_ext, f_start, f_end,
 
 
 def write_analy_bash(outfile, queue, rep, cpp_analy, tag):
+    """Creates the PBS script for submitting cpptraj analysis jobs.
+
+    Parameters
+    ----------
+    outfile : str
+        The name of the output file.
+    queue : str
+        The name of the queue to submit the job through.
+    rep : str
+        The replicate the job is for.
+    cpp_analy : str
+        The name of the cpptraj analysis file that will be submitted.
+    tag : str
+        The tag used in the file names. This should be comprised of
+        the project ID and system.
+
+    Returns
+    -------
+    outfile : txt
+        The written file containing PBS script for submitting the cpptraj
+        analysis job.
+    """
     f = open(outfile, "w+")
     f.write("#!/bin/bash\n")
     f.write(f"#PBS -q {queue}\n")
@@ -78,7 +124,11 @@ def write_analy_bash(outfile, queue, rep, cpp_analy, tag):
     f.close()
 
 
-def write_analy_traj(outfile, file_sep, f_path, tag, f_start, f_end, res_mask):
+def write_analy_traj(outfile, fs, f_path, tag, f_start, f_end, res_mask):
+    """Creates the input file used for analysis with cpptraj.
+
+
+    """
     f = open(outfile, "w+")
     f.write("# Read in the crystal (pre-minimization) structure\n")
     f.write("# You need to specify a prmtop with it because you're reading in\n")
@@ -94,14 +144,18 @@ def write_analy_traj(outfile, file_sep, f_path, tag, f_start, f_end, res_mask):
     f.write("# Get for correlation matrix (evecs = eigenvectors)\n")
     f.write(f"matrix out {tag}{fs}corr{fs}mat.dat name corr_mat byres :{res_mask} correl\n\n")
     f.write("# Get for normal modes\n")
-    f.write(f"matrix out {tag}{fs}covar{fs}mat.dat name norm_mode :{res_mask}@CA,P,C4',C2 covar\n")
+    f.write(f"matrix out {tag}{fs}covar{fs}mat.dat name norm_mode :{res_mask}@CA,P,C4',C2 \\\n")
+    f.write(" covar\n")
     f.write(f"diagmatrix norm_mode out {tag}{fs}evecs.out vecs 100 reduce \\\n")
-    f.write(f" nmwiz nmwizvecs 100 nmwizfile {tag}{fs}100.nmd nmwizmask :{res_mask}\n\n")
-    f.write(f"hbond out {tag}{fs}total{fs}bb{fs}rms.dat \\\n")
+    f.write(f" nmwiz nmwizvecs 100 nmwizfile {tag}{fs}100.nmd \\\n")
+    f.write(f" nmwizmask :{res_mask}@CA,P,C4',C2\n\n")
+    f.write(f"hbond out {tag}{fs}hbond.dat dist 3.0 \\\n")
+    f.write(f" avgout {tag}{fs}hbond{fs}avg.dat\n\n")
+    f.write(f"rms reference out {tag}{fs}total{fs}bb{fs}rms.dat \\\n")
     f.write(f" :{res_mask}@CA,P,O3',O5',C3',C4',C5'\n")
     f.write(f"rmsd :{res_mask} reference perres perresavg range {res_mask} \\\n")
     f.write(f" perresout {tag}{fs}rmsd{fs}byres.dat\n\n")
-    f.write(f"atomicfluct :{res_mask} {tag}{fs}rmsf{fs}byres.dat byres\n")
+    f.write(f"atomicfluct :{res_mask} out {tag}{fs}rmsf{fs}byres.dat byres\n")
     f.write(f"#distance :AAA@PA :BBB@O3' out {tag}{fs}dist{fs}PO{fs}WT.dat\n\n")
     f.close()
 

@@ -81,7 +81,7 @@ rule eda_write:
         n_atom = get_val(1),
         n_prot_at = get_val(2),
         tot_res = get_val(3),
-        mdcrd = get_crd()
+        #mdcrd = get_crd()
     output:
         script = [f"analysis/EDA/{sys_rep_dir}/EDA{fs}job.sh" for
          sys_rep_dir, values in systems.items() for value in values],
@@ -94,7 +94,7 @@ rule eda_write:
     # python3 write-EDA.py alloc \
     # system replicate sys_tag \
     # n_res n_atom n_prot_at tot_residues \
-    # nas_traj fs
+    # nas_traj fs short_tag
         for key, values in systems.items():
             for value in values:
                 shell("""
@@ -103,4 +103,4 @@ rule eda_write:
 {value[1]} {key} {tag}{fs}{value[0]} \
 {params.n_res} {params.n_atom} \
 {params.n_prot_at} {params.tot_res} \
-{params.mdcrd} {fs} {tag}""")
+{tag}{fs}{value[0]}{fs}{p1}-{p2}.mdcrd {fs} {tag}""")
