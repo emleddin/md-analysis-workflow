@@ -94,7 +94,7 @@ def write_analy_traj(outfile, file_sep, f_path, tag, f_start, f_end, res_mask):
     f.write("# Get for correlation matrix (evecs = eigenvectors)\n")
     f.write(f"matrix out {tag}{fs}corr{fs}mat.dat name corr_mat byres :{res_mask} correl\n\n")
     f.write("# Get for normal modes\n")
-    f.write(f"matrix out {tag}{fs}covar{fs}mat.dat name norm_mode :{res_mask} covar\n")
+    f.write(f"matrix out {tag}{fs}covar{fs}mat.dat name norm_mode :{res_mask}@CA,P,C4',C2 covar\n")
     f.write(f"diagmatrix norm_mode out {tag}{fs}evecs.out vecs 100 reduce \\\n")
     f.write(f" nmwiz nmwizvecs 100 nmwizfile {tag}{fs}100.nmd nmwizmask :{res_mask}\n\n")
     f.write(f"hbond out {tag}{fs}total{fs}bb{fs}rms.dat \\\n")

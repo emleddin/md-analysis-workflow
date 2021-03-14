@@ -34,9 +34,11 @@ rule eda_run:
         # [f"analysis/EDA/{sys_rep_dir}/fort.806" for
         #  sys_rep_dir in systems.keys()]
     run:
-        for key, values in systems.items():
-            for value in values:
-                shell("{qsub} analysis/EDA/{sys_rep_dir}/EDA{fs}job.sh")
+        for key in systems.keys():
+                shell("""
+                cd analysis/EDA/{key} &&
+{qsub} analysis/EDA/{key}/EDA{fs}job.sh""")
+
 
 rule eda_copy:
 #! eda_copy         : Copies the `prmtop` file and Fortran 90 program to the
