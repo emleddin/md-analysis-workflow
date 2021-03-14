@@ -37,13 +37,15 @@ rule cpptraj_analysis:
         [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}rmsd{fs}byres.dat" for
          sys_rep_dir, values in systems.items() for value in values],
         [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}rmsf{fs}byres.dat" for
-         sys_rep_dir, values in systems.items() for value in values],
-    shell:
-        """
-        cd {cwd}/analysis/{key}
-        echo {input.sh}
-        """
-        # qsub {input.sh}
+         sys_rep_dir, values in systems.items() for value in values]
+    run:
+        for key, values in systems.items():
+            shell("""
+            cd {cwd}/analysis/{key} &&
+{qsub} cpptraj{fs}analysis.sh &&
+echo {key}""")
+        # `echo` is an sanity check
+        # Can't do `qsub {input.sh}` because it doesn't do one-by-one
 
 
 #-------------------------------------#
@@ -66,12 +68,14 @@ rule cpptraj_strip:
               sys_rep_dir, values in systems.items() for value in values],
         mdcrd = [f"analysis/EDA/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}{p1}-{p2}.mdcrd" for
          sys_rep_dir, values in systems.items() for value in values]
-    shell:
-            """
-            cd {cwd}/analysis/{key}
-            echo {input.sh}
-            """
-        # qsub {input.sh}
+    run:
+        for key in systems.keys():
+            shell("""
+            cd {cwd}/analysis/{key} &&
+{qsub} cpptraj{fs}strip.sh &&
+echo {key} """)
+        # `echo` is an sanity check
+        # Can't do `qsub {input.sh}` because it doesn't do one-by-one
 
 
 #-------------------------------------#
@@ -104,4 +108,4 @@ rule cpptraj_write:
                 cd {cwd}/analysis/{key}
                 python3 {cwd}/{input.script} {que} {value[1]} \
 {value[2]} {tag}{fs}{value[0]} \
-{t_ext} {p1} {p2} {start_res}-{end_res} {fs}""")
+{t_ext} {p1} {p2} {start_res}-{end_res} {fs} {cwd} {value[0]}""")

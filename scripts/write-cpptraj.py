@@ -13,6 +13,8 @@ start_range = int(sys.argv[6])
 end_range = int(sys.argv[7])
 mask = sys.argv[8]
 fs = sys.argv[9]
+work_dir = sys.argv[10]
+system = sys.argv[11]
 
 # Remove the trailing slash on a path, if present
 full_path = full_path.rstrip('/')
@@ -43,12 +45,14 @@ def write_strip_bash(outfile, queue, rep, f_path, cpp_strip, tag):
     f.close()
 
 
-def write_strip_traj(outfile, file_sep, f_path, tag, f_ext, f_start, f_end):
+def write_strip_traj(outfile, file_sep, f_path, tag, f_ext, f_start, f_end,
+                     cwd, sys, rep):
     f = open(outfile, "w+")
     # start, end+1 for correct range
     for i in range(f_start, f_end + 1):
         f.write(f"trajin {f_path}/{tag}{file_sep}md{i}.{f_ext}\n")
     f.write("\n")
+    f.write(f"trajout {cwd}/analysis/EDA/{sys}/{rep}/{tag}{file_sep}{f_start}-{f_end}.mdcrd crd\n\n")
     f.write("autoimage\n")
     f.write("strip :WAT,K+ outprefix strip nobox\n\n")
     f.write(f"trajout {tag}{file_sep}imaged{file_sep}{f_start}-{f_end}.nc cdf\n\n")
@@ -105,7 +109,7 @@ def write_analy_traj(outfile, file_sep, f_path, tag, f_start, f_end, res_mask):
 # Write the stripped files
 write_strip_bash(sh_strip, alloc, replicate, full_path, out_strip, sys_tag)
 write_strip_traj(out_strip, fs, full_path, sys_tag, file_ext, start_range,
-                 end_range)
+                 end_range, work_dir, system, replicate)
 
 # Write the analysis files
 write_analy_bash(sh_analy, alloc, replicate, out_analy, sys_tag)

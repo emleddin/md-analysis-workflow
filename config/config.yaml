@@ -30,6 +30,9 @@ PROJ_PE: "" # Use for none
 # The name of the PBS queue
 QUEUE: "my_cpu_alloc"
 
+# The command used to submit to the queue
+SUB_C: "qsub"
+
 # The extension used for the current trajectory files
 # Include this because we have a tendency to use mdcrd for nc files but
 # you might change to the right ones in your later projects...

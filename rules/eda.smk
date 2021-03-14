@@ -34,8 +34,9 @@ rule eda_run:
         # [f"analysis/EDA/{sys_rep_dir}/fort.806" for
         #  sys_rep_dir in systems.keys()]
     run:
-    # python3 script replicate full_path tag file_ext start_range end_range mask
-        shell("qsub {input.script}")
+        for key, values in systems.items():
+            for value in values:
+                shell("{qsub} analysis/EDA/{sys_rep_dir}/EDA{fs}job.sh")
 
 rule eda_copy:
 #! eda_copy         : Copies the `prmtop` file and Fortran 90 program to the
@@ -54,8 +55,14 @@ rule eda_copy:
         fort = [f"analysis/EDA/{sys_rep_dir}/Residue_E_Decomp_openmp.f90" for
          sys_rep_dir in systems.keys()]
     run:
-        # shell("cp {input.prm} {output.prm}")
-        shell("cp {input.fort} {output.fort}")
+        for key, values in systems.items():
+            for value in values:
+                shell("cp {value[2]}/{tag}{fs}{value[0]}{post_e}.prmtop \
+analysis/EDA/{key}/{tag}{fs}{value[0]}{post_e}.prmtop")
+                shell("cp {input.fort} analysis/EDA/{key}/Residue_E_Decomp_openmp.f90")
+        # Can't do these because it doesn't match them correctly
+        #shell("cp {input.prm} {output.prm}")
+        #shell("cp {input.fort} {output.fort}")
 
 rule eda_write:
 #! eda_write        : Runs a python3 script for generating the input files for

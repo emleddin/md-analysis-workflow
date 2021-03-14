@@ -11,46 +11,7 @@
 
 # TODO: Check tags!!!
 
-configfile: "config/config.yaml"
-
-import os
-import pandas as pd
-
-# Require 6.0 because you haven't tried any others...
-from snakemake.utils import min_version
-min_version("6.0")
-
-## Get the root directoy for the files
-cwd = os.getcwd()
-
-# Read the table of systems and turn into a dictionary
-# Note: The [] around the tuple are VERY IMPORTANT for indexing
-systems_df = pd.read_csv(config["SYSTEMS"], sep='\t')
-systems = dict([(t.Path, [(t.System, t.Replicate, t.Parm_Path, t.Sys_Tag)])
-                for t in systems_df.itertuples()])
-
-# Read the table of EDA values and turn into a dictionary
-# Note: It's VERY IMPORTANT to not have the [] around for indexing
-eda_df = pd.read_csv(config["EDAVALS"], sep='\t')
-eda_vals = dict([(t.Path, (t.NRES, t.NATOM, t.NPROTAT, t.TOTRES))
-                 for t in eda_df.itertuples()])
-
-# Set the config variables as shorthand
-fs = config["F_SEP"]
-tag = config["PROJ_TAG"]
-post_e = config["PROJ_PE"]
-t_ext = config["CUR_TRAJ_EXT"]
-que = config["QUEUE"]
-start_res = config["START_RES_RANGE"]
-end_res = config["END_RES_RANGE"]
-p1 = config["START_PROD_RANGE"]
-p2 = config["END_PROD_RANGE"]
-
 include: "rules/common.smk"
-include: "rules/eda.smk"
-include: "rules/figs.smk"
-include: "rules/hba.smk"
-include: "rules/cpptraj.smk"
 
 rule all:
 # Denote rule help with `#!` at start of line to find with grep later.
@@ -148,3 +109,22 @@ rule help:
         echo '{params.end}'
         """
 
+
+rule clean:
+#! clean            : Removes all the files made by the workflow.
+#!                    Do NOT use this if you care about input files or the
+#!                    concatenated trajectories!
+#!
+    run:
+        # Properly select the analysis paths without using a wildcard
+        # for key, values in systems.items():
+        #     # Use the `-f` flag to silence the warning if it's not there
+        #     shell("rm -f analysis/{key}/cpptraj*")
+        # Use the `-rf` flags to remove the directories and silence if not there
+        shell("rm -rf analysis/")
+
+# Include the other rules
+include: "rules/eda.smk"
+include: "rules/hba.smk"
+include: "rules/cpptraj.smk"
+include: "rules/figs.smk"

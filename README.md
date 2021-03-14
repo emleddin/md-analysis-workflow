@@ -8,8 +8,13 @@ workflow for working with AMBER MD analysis.
 
 You will need to 
 [install `snakemake`](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
-for your system. 
+with Python 3.x for your system. 
 Different components of this workflow also require an installation of R.
+
+Currently, the `Residue_E_Decomp_openmp.f90` in the `scripts/` directory is a 
+blank file for testing.
+You can download the actual script from 
+the [Cisneros Group's GitHub](https://github.com/CisnerosResearch/AMBER-EDA).
 
 The base directory is the entry point for this workflow.
 - `analysis`: contains the output from analyses.
@@ -164,6 +169,71 @@ the system will need to be converted to a PDB to determine `NRES` and `TOTRES`.
  data first!!! 
  You may think it'll work fine, but that's a really easy way to overwrite or 
  delete your data in 10 seconds.
+
+The `rename` command (which doesn't exist in all systems...) can be useful
+for doing this.
+It takes the current naming you want to switch, the thing you want to switch 
+it to, and the files it should be applied to as arguments.
+
+```bash
+$ ls
+thing-name-2020-want.inpcrd  thing-name-2020-want_md3.nc
+thing-name-2020-want_md1.nc  thing-name-2020-want.prmtop
+thing-name-2020-want_md2.nc
+$ rename thing-name-2020-want proteinID-WT-wat thing-name-2020-want*
+$ ls
+proteinID-WT-wat.inpcrd  proteinID-WT-wat_md2.nc  proteinID-WT-wat.prmtop
+proteinID-WT-wat_md1.nc  proteinID-WT-wat_md3.nc
+$ rename _md -md proteinID-WT-wat_*
+$ ls
+proteinID-WT-wat.inpcrd  proteinID-WT-wat-md2.nc  proteinID-WT-wat.prmtop
+proteinID-WT-wat-md1.nc  proteinID-WT-wat-md3.nc
+```
+
+
+## Running on a Cluster (But Not the Snakemake Way)
+
+Part of what this workflow does is build the specific queue submission scripts
+for each job, since each job type has different needs.
+While `snakemake` can run through a cluster system, this approach seemed ideal 
+when dealing with specific workflow rules, especially those pertaining to EDA.
+However, because of this atypical approach to snakemake, we want to set the 
+`output-wait` flag so that it knows that it might take a while for certain 
+jobs to run.
+This may backfire!
+If you don't see any other jobs in the queue from the snakemake job for a 
+few minutes, you may want to end the job and investigate.
+
+Similarly, because interactive jobs are dependent on the VPN, we can submit
+the overall `snakemake` job through the queuing system.
+
+```bash
+#!/bin/bash
+#PBS -q my_cpu_alloc
+#PBS -l nodes=1:ppn=1,mem=6GB
+#PBS -j oe
+#PBS -r n
+#PBS -o err.error
+#PBS -N proteinID_smk
+
+cd $PBS_O_WORKDIR
+
+## Use this to evaluate the conda commands
+# eval "$(conda shell.bash hook)"
+source ~/.bash_profile
+
+## Set-up conda environment
+# conda create -n snakemake snakemake
+
+## Activate the conda environment
+conda activate snakemake
+
+## Run snakemake
+## Output wait time is in seconds
+## Wait 2 hours for new files: 7200
+## Wait 24 hours for new files: 86400
+snakemake --cores 1 --output-wait 7200
+```
 
 ## Citations
 ### Python
