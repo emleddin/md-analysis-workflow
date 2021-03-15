@@ -1,0 +1,8 @@
+axes.prop_cycle    : cycler('color', ['332288', '117733', '44AA99', 'CC6677'])
+# Use the full Paul Tol muted color scheme https://personal.sron.nl/~pault/
+#axes.prop_cycle    : cycler('color', ['332288', '88CCEE', '44AA99', '117733', '999933', 'DDCC77', 'CC6677', '882255', 'AA4499'])
+                      ## color cycle for plot lines  as list of string
+                      ## colorspecs: single letter, long name, or web-style hex
+                      ## Note the use of string escapes here
+                      ## ('1f77b4', instead of 1f77b4)
+                      ## as opposed to the rest of this file.
