@@ -2,6 +2,25 @@
 
 [![Snakemake](https://img.shields.io/badge/snakemake-%E2%89%A56.0.0-blueviolet.svg?style=flat)](https://snakemake.readthedocs.io)
 
+## Table of contents
+
+* [About](#about)
+* [What To Install](#what-to-install)
+* [Before You Use](#before-you-use)
+* [Getting Ready for Your System](#getting-ready-for-your-system)
+* [:warning: File Naming Warning :warning:](#warning-file-naming-warning-warning)
+* [Using Snakemake](#using-snakemake)
+  * [Testing the Workflow](#testing-the-workflow)
+  * [Removing Past Output](#removing-past-output)
+* [Running on a Cluster (But Not the Snakemake Way)](#running-on-a-cluster-but-not-the-snakemake-way)
+* [Citations](#citations)
+  * [Python](#python)
+  * [R](#r)
+  * [Other](#other)
+
+
+## About
+
 This repository is a
 [Snakemake](https://snakemake.readthedocs.io/en/stable/index.html)
 workflow for working with AMBER MD analysis.
@@ -50,52 +69,35 @@ $ conda install prody
 $ conda install statsmodels
 ```
 
-
-## Using Snakemake
-You can use `snakemake -np` as a dry-run.
-It will verify that all files are present and show commands to be executed.
-If files are missing in the expected paths, it will print a warning.
-
-Each rule can be used alone with something like:
+If you are going to install this *today*, you will want to use the GitHub
+version of Prody due to an error when parsing NMD file in the 2.0 release.
+Instead of `conda install prody`, instead do:
 ```
-snakemake <rule> --cores 1
-```
-There's a whole host of different options in the
-[snakemake documentation](https://snakemake.readthedocs.io/en/stable/).
-
-### Testing the Workflow
-You can create a PDF of how Snakemake thinks your workflow links together:
-```
-snakemake --forceall --dag | dot -Tpdf > dag.pdf
-```
-You can also make a PNG by changing the file type.
-```
-snakemake --forceall --dag | dot -Tpng > dag.png
-```
-This is a *great* way to check for errors!
-
-
-![snakemake predicted workflow](images/dag.png)
-
-
-### Removing Past Output
-You can test deleting output from snakemake with:
-```
-snakemake cpptraj_write --delete-all-output --dry-run
-```
-And actually do it with:
-```
-snakemake cpptraj_write --delete-all-output --cores 1
+$ conda activate snakemake
+$ conda install git pip
+$ pip install git+https://github.com/prody/ProDy.git
 ```
 
-This particular workflow has a `clean` rule, which will remove the previous
-analyses.
-Be careful, though, as this will remove any generated input scripts or
-trajectory files.
-You can rewrite the rule for yourself in `rules/common.smk`.
-```
-snakemake clean --cores 1
-```
+## Before You Use
+
+The `scripts/` directory contains the scripts for the analysis.
+If you have specific analyses or plotting needs, you will want to modify
+these scripts.
+For example, if you want to plot distances for a specific atom pair,
+you will want to add that into the `write_analy_traj` function of
+`write-cpptraj.py`.
+Similarly, if you know you need specific axes for plots, you will want to
+add those to the relevant scripts.
+
+If you want to set up variables as part of a `.tsv`, then that process will
+require a bit more work, including:
+- Adding the code to read the new `.tsv` starting with a `Path` column that
+  matches `systems.tsv`
+- Storing the newly read `.tsv` as a dictionary
+- Get snakemake to parse the dictionary when iterating through the systems
+- Adding system arguments to the Python scripts
+- Adding those system arguments into the appropriate `rules/*.smk` file
+
 
 ## Getting Ready for Your System
 The `config` directory contains 3 files:
@@ -205,6 +207,53 @@ $ rename _md -md proteinID-WT-wat_*
 $ ls
 proteinID-WT-wat.inpcrd  proteinID-WT-wat-md2.nc  proteinID-WT-wat.prmtop
 proteinID-WT-wat-md1.nc  proteinID-WT-wat-md3.nc
+```
+
+## Using Snakemake
+
+You can use `snakemake -np` as a dry-run.
+It will verify that all files are present and show commands to be executed.
+If files are missing in the expected paths, it will print a warning.
+
+Each rule can be used alone with something like:
+```
+snakemake <rule> --cores 1
+```
+There's a whole host of different options in the
+[snakemake documentation](https://snakemake.readthedocs.io/en/stable/).
+
+### Testing the Workflow
+You can create a PDF of how Snakemake thinks your workflow links together:
+```
+snakemake --forceall --dag | dot -Tpdf > dag.pdf
+```
+You can also make a PNG by changing the file type.
+```
+snakemake --forceall --dag | dot -Tpng > dag.png
+```
+This is a *great* way to check for errors!
+
+
+![snakemake predicted workflow](images/dag.png)
+
+
+### Removing Past Output
+You can test deleting output from snakemake with:
+```
+snakemake cpptraj_write --delete-all-output --dry-run
+```
+And actually do it with:
+```
+snakemake cpptraj_write --delete-all-output --cores 1
+```
+
+This particular workflow has a `clean` rule, which will remove the previous
+analyses.
+Be careful, though, as this will remove any generated input scripts or
+trajectory files.
+You can rewrite the rule for yourself in `rules/common.smk`.
+```
+snakemake clean --cores 1
 ```
 
 
