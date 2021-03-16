@@ -55,6 +55,8 @@ rule all:
          sys_rep_dir, values in systems.items() for value in values],
         [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}hbond{fs}avg.dat" for
          sys_rep_dir, values in systems.items() for value in values],
+        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}hbond.dat" for
+         sys_rep_dir, values in systems.items() for value in values],
         [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}total{fs}bb{fs}rms.dat" for
          sys_rep_dir, values in systems.items() for value in values],
         [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}rmsd{fs}byres.dat" for
