@@ -46,5 +46,10 @@ END_RES_RANGE: "392"
 START_PROD_RANGE: "25"
 END_PROD_RANGE: "350"
 
+# The divisor to use for the RMSD graphs to get the of frames per nanosecond.
+# Typically, if you use Langevin this is 100, and 500 for Berendsen.
+# This will be put in the gnuplot script as ($1/(TIME_DIVIDER)).
+TIME_DIVIDER: "100"
+
 # TODO: Add SLURM script option
 # TODO: Add LSF script option

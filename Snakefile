@@ -86,7 +86,14 @@ rule all:
          key, values in systems.items() for value in values],
         # Normal Modes
         [f"analysis/NMA/{tag}{fs}{value[0]}{fs}{value[1]}{fs}NMA.png" for
-         key, values in systems.items() for value in values]
+         key, values in systems.items() for value in values],
+        # RMS Images
+        [f"analysis/RMS/{tag}{fs}{systems_df.groupby('System')['Replicate'].apply(list).index[i]}-rmsds.png"
+         for i in range(len(systems_df.groupby("System")["Replicate"].apply(list)))],
+        [f"analysis/RMS/{tag}{fs}{systems_df.groupby('System')['Replicate'].apply(list).index[i]}-rmsf.png"
+         for i in range(len(systems_df.groupby("System")["Replicate"].apply(list)))],
+        [f"analysis/RMS/{tag}{fs}{systems_df.groupby('System')['Replicate'].apply(list).index[i]}-hbonds.png"
+         for i in range(len(systems_df.groupby("System")["Replicate"].apply(list)))]
 
 
 rule help:
