@@ -38,9 +38,12 @@ SUB_C: "qsub"
 # you might change to the right ones in your later projects...
 CUR_TRAJ_EXT: "mdcrd"
 
-# The residue ranges for the standard cpptraj analysis. (ex: protein 1-455)
+# The residue ranges for the standard cpptraj analysis. (ex: protein/nuc 1-455)
 START_RES_RANGE: "1"
 END_RES_RANGE: "392"
+
+# The number of amino acids for the secondary structure analysis (ex: 1-430)
+NUM_AA: "430"
 
 # The production frames for the trajectory labels (ex: 25-350 as ns)
 START_PROD_RANGE: "25"
@@ -50,6 +53,10 @@ END_PROD_RANGE: "350"
 # Typically, if you use Langevin this is 100, and 500 for Berendsen.
 # This will be put in the gnuplot script as ($1/(TIME_DIVIDER)).
 TIME_DIVIDER: "100"
+
+# The expected amount of simulation time to use for the graphs, in nano seconds.
+# This should probably be END_PROD_RANGE - START_PROD_RANGE
+SIM_TIME: "325"
 
 # TODO: Add SLURM script option
 # TODO: Add LSF script option

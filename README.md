@@ -277,7 +277,7 @@ the overall `snakemake` job through the queuing system.
 ```bash
 #!/bin/bash
 #PBS -q my_cpu_alloc
-#PBS -l nodes=1:ppn=1,mem=6GB
+#PBS -l nodes=1:ppn=2,mem=8GB
 #PBS -j oe
 #PBS -r n
 #PBS -o err.error
@@ -299,7 +299,7 @@ conda activate snakemake
 ## Output wait time is in seconds
 ## Wait 2 hours for new files: 7200
 ## Wait 24 hours for new files: 86400
-snakemake --cores 1 --output-wait 7200
+snakemake --cores 2 --output-wait 7200
 ```
 
 ## Citations

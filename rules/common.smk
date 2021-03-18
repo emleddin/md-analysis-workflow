@@ -35,9 +35,11 @@ que = config["QUEUE"]
 
 start_res = config["START_RES_RANGE"]
 end_res = config["END_RES_RANGE"]
+n_aa = config["NUM_AA"]
 p1 = config["START_PROD_RANGE"]
 p2 = config["END_PROD_RANGE"]
 div = config["TIME_DIVIDER"]
+sim_time = config["SIM_TIME"]
 
 # --------------------------------- Functions ---------------------------------#
 

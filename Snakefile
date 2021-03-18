@@ -95,7 +95,10 @@ rule all:
         [f"analysis/RMS/{tag}{fs}{systems_df.groupby('System')['Replicate'].apply(list).index[i]}-rmsf.png"
          for i in range(len(systems_df.groupby("System")["Replicate"].apply(list)))],
         [f"analysis/RMS/{tag}{fs}{systems_df.groupby('System')['Replicate'].apply(list).index[i]}-hbonds.png"
-         for i in range(len(systems_df.groupby("System")["Replicate"].apply(list)))]
+         for i in range(len(systems_df.groupby("System")["Replicate"].apply(list)))],
+        # Secondary Structure
+        [f"analysis/2SA/{tag}{fs}{value[0]}{fs}{value[1]}{fs}2SA.png" for
+         key, values in systems.items() for value in values]
 
 
 rule help:

@@ -107,3 +107,29 @@ rule rms_conv:
         cd analysis/RMS
         for file in *.eps; do convert $file -rotate 90 ${{file%.*}}.png; done""")
 
+
+rule second_struct:
+#! second_struct    : Fixes the gnuplot script written by cpptraj for secondary
+#!                    structure analysis and generates the plot.
+#!
+    input:
+        script = "scripts/2SA-plot-fix.py",
+        file = [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}secstruct.gnu" for
+         sys_rep_dir, values in systems.items() for value in values]
+    output:
+        pic = [f"analysis/2SA/{tag}{fs}{value[0]}{fs}{value[1]}{fs}2SA.png" for
+         key, values in systems.items() for value in values]
+    run:
+        for key, values in systems.items():
+            for value in values:
+                # Do not give PNG the path because you run gnuplot from the
+                # specified folder
+                shell("""
+                python3 {input.script} \
+analysis/{key}/{tag}{fs}{value[0]}{fs}secstruct.gnu \
+analysis/2SA/{tag}{fs}{value[0]}{fs}{value[1]}{fs}secstruct{fs}fix.gnu \
+{tag}{fs}{value[0]}{fs}{value[1]}{fs}2SA.png \
+{n_aa} {sim_time} {div} """)
+                shell("""                                                       
+                cd analysis/2SA                                                 
+                gnuplot {tag}{fs}{value[0]}{fs}{value[1]}{fs}secstruct{fs}fix.gnu""")

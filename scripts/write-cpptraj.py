@@ -2,7 +2,7 @@ import sys
 
 # python write-cpptraj.py alloc replicate full_path tag file_ext start_range end_range
 # mask file_sep
-# Ex: python write-cpptraj.py gac.cpu r1 ../test thing mdcrd 22 30 1-476 -
+# Ex: python write-cpptraj.py gac.cpu r1 ../test thing mdcrd 22 30 1-476 - 450
 # script_name = sys.argv[0]
 alloc = sys.argv[1]
 replicate = sys.argv[2]
@@ -15,6 +15,7 @@ mask = sys.argv[8]
 fs = sys.argv[9]
 work_dir = sys.argv[10]
 system = sys.argv[11]
+n_aa = int(sys.argv[12])
 
 # Remove the trailing slash on a path, if present
 full_path = full_path.rstrip('/')
@@ -71,6 +72,37 @@ def write_strip_bash(outfile, queue, rep, f_path, cpp_strip, tag):
 
 def write_strip_traj(outfile, file_sep, f_path, tag, f_ext, f_start, f_end,
                      cwd, sys, rep):
+    """Creates the cpptraj script for writing an ASCII trajectory for EDA and a
+    stripped NetCDF trajectory for analysis.
+
+    Parameters
+    ----------
+    outfile : str
+        The name of the output cpptraj strip file.
+    file_sep: str
+        Determines the separator to use for the file name.
+    f_path : str
+        The full path to the trajectory files (parm_path).
+    tag : str
+        Specifies the inital title information for the output files.
+    f_ext : str
+        Current file extension used for trajectory files (ex. mdcrd or nc).
+    f_start : int
+        The number associated with the first trajectory file to read in.
+    f_end : int
+        The number associated with the final trajectory file to read in.
+    cwd : str
+        The path to the current working directory for the overall analysis.
+    sys : str
+        The system to make the analysis for.
+    rep : str
+        The replicate of a given `sys`.
+
+    Returns
+    -------
+    outfile : txt
+        The input file for cpptraj stripping.
+    """
     f = open(outfile, "w+")
     # start, end+1 for correct range
     for i in range(f_start, f_end + 1):
@@ -124,10 +156,32 @@ def write_analy_bash(outfile, queue, rep, cpp_analy, tag):
     f.close()
 
 
-def write_analy_traj(outfile, fs, f_path, tag, f_start, f_end, res_mask):
+def write_analy_traj(outfile, fs, f_path, tag, f_start, f_end, num_aa, res_mask):
     """Creates the input file used for analysis with cpptraj.
 
+    Parameters
+    ----------
+    outfile : str
+        The name of the output cpptraj strip file.
+    fs: str
+        Determines the separator to use for the file name.
+    f_path : str
+        The full path to the trajectory files (parm_path).
+    tag : str
+        Specifies the inital title information for the output files.
+    f_start : int
+        The number associated with the first trajectory file to read in.
+    f_end : int
+        The number associated with the final trajectory file to read in.
+    num_aa : int
+        Number of amino acids in the system for secondary structure analysis.
+    res_mask : str
+        The residue mask for specific analyses.
 
+    Returns
+    -------
+    outfile : txt
+        The input file for cpptraj analysis.
     """
     f = open(outfile, "w+")
     f.write("# Read in the crystal (pre-minimization) structure\n")
@@ -156,6 +210,7 @@ def write_analy_traj(outfile, fs, f_path, tag, f_start, f_end, res_mask):
     f.write(f"rmsd :{res_mask} reference perres perresavg range {res_mask} \\\n")
     f.write(f" perresout {tag}{fs}rmsd{fs}byres.dat\n\n")
     f.write(f"atomicfluct :{res_mask} out {tag}{fs}rmsf{fs}byres.dat byres\n")
+    f.write(f"secstruct :1-{num_aa} out {tag}{fs}secstruct.gnu\n")
     f.write(f"#distance :AAA@PA :BBB@O3' out {tag}{fs}dist{fs}PO{fs}WT.dat\n\n")
     f.close()
 
@@ -167,4 +222,5 @@ write_strip_traj(out_strip, fs, full_path, sys_tag, file_ext, start_range,
 
 # Write the analysis files
 write_analy_bash(sh_analy, alloc, replicate, out_analy, sys_tag)
-write_analy_traj(out_analy, fs, full_path, sys_tag, start_range, end_range, mask)
+write_analy_traj(out_analy, fs, full_path, sys_tag, start_range, end_range,
+                 n_aa, mask)
