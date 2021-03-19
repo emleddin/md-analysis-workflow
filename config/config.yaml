@@ -58,5 +58,10 @@ TIME_DIVIDER: "100"
 # This should probably be END_PROD_RANGE - START_PROD_RANGE
 SIM_TIME: "325"
 
+# Residue of interest for EDA.
+# The interaction of every residue with this residue, with the exception of
+# those directly connected to it, will be calculated.
+ROI: "250"
+
 # TODO: Add SLURM script option
 # TODO: Add LSF script option

@@ -1,6 +1,35 @@
 #-------------------------------------#
 #              EDA Files              #
 #-------------------------------------#
+rule eda_avg:
+#! eda_avg          : Averages the EDA data for a system from a set of
+#!                    replicates.
+#!
+    input:
+        base = "scripts/r-eda-avgs-base.txt",
+        coul = [f"analysis/EDA/{sys_rep_dir}/fort_coulomb_interaction.dat" for
+         sys_rep_dir in systems.keys()],
+        vdw = [f"analysis/EDA/{sys_rep_dir}/fort_vdw_interaction.dat" for
+         sys_rep_dir in systems.keys()]
+    output:
+        coul = [f"analysis/EDA/{value[0]}/{tag}{fs}{value[0]}{fs}EDA{fs}res{roi}{fs}coul{fs}avg.dat" for
+         key, values in systems.items() for value in values],
+        vdw = [f"analysis/EDA/{value[0]}/{tag}{fs}{value[0]}{fs}EDA{fs}res{roi}{fs}vdw{fs}avg.dat" for
+         key, values in systems.items() for value in values],
+        tot = [f"analysis/EDA/{value[0]}/{tag}{fs}{value[0]}{fs}EDA{fs}res{roi}{fs}tot{fs}avg.dat" for
+         key, values in systems.items() for value in values]
+    run:
+        # Group the systems by system
+        eda_groups = systems_df.groupby("System")["Replicate"].apply(list)
+        # For the systems
+        for i in range(len(eda_groups)):
+            var = eda_groups.index[i]
+            #print(var)
+            eda_diff_script(f"analysis/EDA/{eda_groups.index[i]}/rmagic{fs}EDA{fs}avg.r",
+             {input.base}, cwd, tag, fs, roi, eda_groups.index[i], eda_groups[i])
+            shell("cd {cwd}/analysis/EDA/{var} && Rscript rmagic{fs}EDA{fs}avg.r")
+
+
 rule eda_run:
 #! eda_run          : Submits the script for running the EDA Fortran program
 #!                    to the queue scheduler.

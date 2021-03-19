@@ -6,6 +6,7 @@
 
 * [About](#about)
 * [What To Install](#what-to-install)
+  * [A Note on R](#a-note-on-r)
 * [Before You Use](#before-you-use)
 * [Getting Ready for Your System](#getting-ready-for-your-system)
 * [:warning: File Naming Warning :warning:](#warning-file-naming-warning-warning)
@@ -58,16 +59,26 @@ This will make debugging way, way easier!
 ## What To Install
 
 Following the `snakemake` recommendations, you should set up a `conda`
-environment.
+environment using Python 3.6 or newer.
 ```bash
 # Create a new environment named `snakemake` and install `snakemake` into it
 $ conda -n snakemake snakemake
 # Activate the environment
 $ conda activate snakemake
 # Install the packages needed for plotting scripts
+# `pandas` and `numpy` should already be `snakemake` dependencies
 $ conda install matplotlib
 $ conda install prody
 $ conda install statsmodels
+$ conda install gnuplot
+# Install the things necessary for R (required for `eda_avg` rule)
+$ conda install r-base r-essentials
+$ conda install r-abind
+```
+
+You can build this environment simply by running:
+```bash
+$ conda env create -f env/environment.yml
 ```
 
 If you are going to install this *today*, you will want to use the GitHub
@@ -78,6 +89,20 @@ $ conda activate snakemake
 $ conda install git pip
 $ pip install git+https://github.com/prody/ProDy.git
 ```
+
+The `gnuplot` install is not required if you already have a `gnuplot`
+installation on the system you will use.
+
+### A Note on R
+
+If you already have an R installation, you don't have to go through the conda
+R installation steps.
+In that case, if R is stored a module, source the module before running
+the workflow with snakemake.
+If you would rather have everything contained in conda, make sure you
+comment out any `~/.Renviron` file you may have, as it will point to the wrong
+library path, and those libraries are likely incompatible with the
+conda-installed version.
 
 ## Before You Use
 

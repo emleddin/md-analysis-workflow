@@ -83,6 +83,13 @@ rule all:
         #  sys_rep_dir in systems.keys()],
         # [f"analysis/EDA/{sys_rep_dir}/fort.806" for
         #  sys_rep_dir in systems.keys()]
+        # EDA Averaging
+        [f"analysis/EDA/{value[0]}/{tag}{fs}{value[0]}{fs}EDA{fs}res{roi}{fs}coul{fs}avg.dat" for
+         key, values in systems.items() for value in values],
+        [f"analysis/EDA/{value[0]}/{tag}{fs}{value[0]}{fs}EDA{fs}res{roi}{fs}vdw{fs}avg.dat" for
+         key, values in systems.items() for value in values],
+        [f"analysis/EDA/{value[0]}/{tag}{fs}{value[0]}{fs}EDA{fs}res{roi}{fs}tot{fs}avg.dat" for
+         key, values in systems.items() for value in values],
         # Matrix Correlation
         [f"analysis/MatCorr/{tag}{fs}{value[0]}{fs}{value[1]}{fs}mat{fs}corr.png" for
          key, values in systems.items() for value in values],

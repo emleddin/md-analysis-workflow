@@ -40,6 +40,7 @@ p1 = config["START_PROD_RANGE"]
 p2 = config["END_PROD_RANGE"]
 div = config["TIME_DIVIDER"]
 sim_time = config["SIM_TIME"]
+roi = config["ROI"]
 
 # --------------------------------- Functions ---------------------------------#
 
@@ -216,3 +217,90 @@ def gnuplot_rms(outfile, tag, fs, div, start_residue, end_residue, sys, files):
             f.write(f"\"../../analysis/{sys}/{files[rep]}/{tag}{fs}{sys}{fs}rmsf{fs}byres.dat\" u 1:2 w lines t \"{files[rep]}\" lw 4, \\\n")
     f.write('\n')
     f.close()
+
+
+def eda_diff_script(outfile, base_script, cwd, tag, fs, ROI, sys, files):
+    """Sets up the R script for averaging the EDA data for replicates of a
+    system.
+
+    Parameters
+    ----------
+    outfile : str
+        The name of the output gnuplot script.
+    base_script : txt
+        The file containing the bulk of the R script that's not
+        system-dependent.
+    cwd : str
+        The path to the current working directory.
+    tag : str
+        Specifies the inital title information for the input data files.
+    fs : str
+        Determines the separator to use for the file name.
+    ROI : int
+        The residue of interest for EDA to get the interactions of each residue
+        with.
+    sys : str
+        The system to create the averages for.
+    files : list
+        A list of the replicates for a given `sys`.
+
+    Returns
+    -------
+    outfile : gnuplot
+        The input script for gnuplot.
+
+    Notes
+    -----
+    You cannot use line smoothing with matplotlib, which is why you'd go
+    through the hassle for gnuplot.
+    The gnuplot output are explicitly named and written to using EPS format.
+    EPS does a better job of determining where information should go instead
+    of directly saving as a PNG.
+    """
+    f = open(outfile, "w+")
+    for rep in range(len(files)):
+        if rep == 0:
+            f.write(f'infile1Ac <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort_coulomb_interaction.dat")\n')
+            f.write(f'infile1Av <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort_vdw_interaction.dat")\n')
+            # f.write(f'infile1Ac <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort.803")\n')
+            # f.write(f'infile1Av <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort.806")\n')
+        elif rep == 1:
+            f.write(f'infile2Ac <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort_coulomb_interaction.dat")\n')
+            f.write(f'infile2Av <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort_vdw_interaction.dat")\n')
+            # f.write(f'infile2Ac <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort.803")\n')
+            # f.write(f'infile2Av <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort.806")\n')
+        elif rep == 2:
+            f.write(f'infile3Ac <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort_coulomb_interaction.dat")\n')
+            f.write(f'infile3Av <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort_vdw_interaction.dat")\n')
+            # f.write(f'infile3Ac <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort.803")\n')
+            # f.write(f'infile3Av <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort.806")\n')
+        elif rep == 3:
+            f.write(f'infile4Ac <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort_coulomb_interaction.dat")\n')
+            f.write(f'infile4Av <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort_vdw_interaction.dat")\n')
+            # f.write(f'infile4Ac <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort.803")\n')
+            # f.write(f'infile4Av <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort.806")\n')
+        elif rep == 4:
+            f.write(f'infile5Ac <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort_coulomb_interaction.dat")\n')
+            f.write(f'infile5Av <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort_vdw_interaction.dat")\n')
+            # f.write(f'infile5Ac <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort.803")\n')
+            # f.write(f'infile5Av <- Sys.glob("{cwd}/analysis/EDA/{sys}/{files[rep]}/fort.806")\n')
+        else:
+            print("\nThe eda_diff_script base script is usually only for 5\n")
+            print(" replicates. I encourage you to check that, or modify \n")
+            print(" this function, because I didn't write that correctly.\n")
+            break
+    f.write("\n")
+    f.write(f'A_coul <- "{cwd}/analysis/EDA/{sys}/{tag}{fs}{sys}{fs}EDA{fs}res{ROI}{fs}coul{fs}avg.dat"\n')
+    f.write(f'A_vdw <- "{cwd}/analysis/EDA/{sys}/{tag}{fs}{sys}{fs}EDA{fs}res{ROI}{fs}vdw{fs}avg.dat"\n')
+    f.write(f'A_tot <- "{cwd}/analysis/EDA/{sys}/{tag}{fs}{sys}{fs}EDA{fs}res{ROI}{fs}tot{fs}avg.dat"\n')
+    f.write("\n")
+    f.write(f"ROI <- {ROI}\n")
+    f.write(f"sets <- {len(files)}.0000\n")
+    base = open(str(base_script), "r")
+    lines = base.readlines()
+    base.close()
+    for line in lines:
+        f.write(line)
+    f.write("\n")
+    f.close()
+

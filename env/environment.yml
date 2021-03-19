@@ -1,0 +1,17 @@
+name: snakemake
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.6
+  - snakemake>=6.0
+  - pandas
+  - numpy
+  - matplotlib
+  - prody
+  - statsmodels
+  - gnuplot
+  - r-base
+  - r-essentials
+  - r-abind
