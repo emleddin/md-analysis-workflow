@@ -1,0 +1,5 @@
+SysA_SysB	SystemA	A_Path	SystemB	B_Path
+MUTA-WT	MUTA	analysis/EDA/MUTA	WT	analysis/EDA/WT
+MUTB-WT	MUTB	/full/external/path/EDA/MUTB	WT	analysis/EDA/WT
+MUTC-WT	MUTC	analysis/EDA/MUTC	WT	analysis/EDA/WT
+MUTA-MUTB	MUTA	analysis/EDA/MUTA	MUTB	/full/external/path/EDA/MUTB

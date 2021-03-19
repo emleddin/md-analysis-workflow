@@ -1,6 +1,31 @@
 #-------------------------------------#
 #              EDA Files              #
 #-------------------------------------#
+rule eda_diff:
+#! eda_diff         : Uses the averaged EDA data for two systems to compare
+#!                    them. The system comparisons are set up in
+#!                    `config/EDAcompare.tsv`.
+#!
+    input:
+        "scripts/rmagic-EDA-avg-diffs.r",
+        [f"{value[1]}/{tag}{fs}{value[0]}{fs}EDA{fs}res{roi}{fs}tot{fs}avg.dat" for
+         comparison, values in eda_comps.items() for value in values],
+        [f"{value[3]}/{tag}{fs}{value[2]}{fs}EDA{fs}res{roi}{fs}tot{fs}avg.dat" for
+         comparison, values in eda_comps.items() for value in values]
+    output:
+        [f"analysis/EDA/{tag}{fs}{value[0]}-{value[2]}{fs}total{fs}interaction{fs}res{roi}{fs}avg.dat"
+         for comparison, values in eda_comps.items() for value in values]
+    run:
+        for comparison, values in eda_comps.items():
+            for value in values:
+                shell("""
+                Rscript scripts/rmagic-EDA-avg-diffs.r \
+{value[1]}/{tag}{fs}{value[0]}{fs}EDA{fs}res{roi}{fs}tot{fs}avg.dat \
+{value[3]}/{tag}{fs}{value[2]}{fs}EDA{fs}res{roi}{fs}tot{fs}avg.dat \
+analysis/EDA/{tag}{fs}{value[0]}-{value[2]}{fs}total{fs}interaction{fs}res{roi}{fs}avg.dat \
+{roi}""")
+
+
 rule eda_avg:
 #! eda_avg          : Averages the EDA data for a system from a set of
 #!                    replicates.

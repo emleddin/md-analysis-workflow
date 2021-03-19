@@ -1,8 +1,12 @@
-# Set up the systems in the Snakefile itself
-
+# Define the other configuration files (tab separated values)
+# These files must have the columns below unless you want to modify many things
+# SYSTEMS: Path	System	Replicate	Parm_Path	Sys_Tag
+# EDAVALS: Path	NRES	NATOM	NPROTAT	TOTRES
+# EDACOMPS: SysA-SysB	SystemA	A_Path	SystemB	B_Path
 
 SYSTEMS: "config/systems.tsv"
 EDAVALS: "config/EDAvalues.tsv"
+EDACOMPS: "config/EDAcompare.tsv"
 
 #---------------------------------- Overall ----------------------------------#
 

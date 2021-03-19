@@ -90,6 +90,9 @@ rule all:
          key, values in systems.items() for value in values],
         [f"analysis/EDA/{value[0]}/{tag}{fs}{value[0]}{fs}EDA{fs}res{roi}{fs}tot{fs}avg.dat" for
          key, values in systems.items() for value in values],
+        # EDA Differences
+        [f"analysis/EDA/{tag}{fs}{value[0]}-{value[2]}{fs}total{fs}interaction{fs}res{roi}{fs}avg.dat"
+         for comparison, values in eda_comps.items() for value in values],
         # Matrix Correlation
         [f"analysis/MatCorr/{tag}{fs}{value[0]}{fs}{value[1]}{fs}mat{fs}corr.png" for
          key, values in systems.items() for value in values],

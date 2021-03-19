@@ -25,6 +25,12 @@ eda_df = pd.read_csv(config["EDAVALS"], sep='\t')
 eda_vals = dict([(t.Path, (t.NRES, t.NATOM, t.NPROTAT, t.TOTRES))
                  for t in eda_df.itertuples()])
 
+# Read the table of EDA comparisons and turn into a dictionary
+# Note: The [] around the tuple are VERY IMPORTANT for indexing
+eda_comp_df = pd.read_csv(config["EDACOMPS"], sep='\t')
+eda_comps = dict([(t.SysA_SysB, [(t.SystemA, t.A_Path, t.SystemB, t.B_Path)])
+                for t in eda_comp_df.itertuples()])
+
 # Set the config variables as shorthand
 fs = config["F_SEP"]
 tag = config["PROJ_TAG"]
