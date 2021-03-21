@@ -46,6 +46,10 @@ rule eda_avg:
         tot = [f"analysis/EDA/{system}/{proj_tag}{fs}{system}{fs}EDA{fs}res{roi}{fs}tot{fs}avg.dat" for
          key, values in systems.items() for system, replicate, \
                         parm_path, sys_tag, prod1, prod2, sim_time in values],
+        ex1 = [f"{value[1]}/{proj_tag}{fs}{value[0]}{fs}EDA{fs}res{roi}{fs}tot{fs}avg.dat" for
+         comparison, values in eda_comps.items() for value in values],
+        ex2 = [f"{value[3]}/{proj_tag}{fs}{value[2]}{fs}EDA{fs}res{roi}{fs}tot{fs}avg.dat" for
+         comparison, values in eda_comps.items() for value in values]
     run:
         # Group the systems by system
         eda_groups = systems_df.groupby("System")["Replicate"].apply(list)
