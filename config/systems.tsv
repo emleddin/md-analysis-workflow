@@ -1,10 +1,10 @@
-Path	System	Replicate	Parm_Path	Sys_Tag
-WT/r1	WT	r1	/home/$USER/Research/proteinID/WT/r1	ProteinID_WT
-WT/r2	WT	r2	/home/$USER/Research/proteinID/WT/r2	ProteinID_WT
-WT/r3	WT	r3	/home/$USER/Research/proteinID/WT/r3	ProteinID_WT
-MutA/r1	MutA	r1	/home/$USER/Research/proteinID/MutA/r1	ProteinID_MutA
-MutA/r2	MutA	r2	/home/$USER/Research/proteinID/MutA/r2	ProteinID_MutA
-MutA/r3	MutA	r3	/home/$USER/Research/proteinID/MutA/r3	ProteinID_MutA
-MutB/r1	MutB	r1	/home/$USER/Research/proteinID/MutB/r1	ProteinID_MutB
-MutB/r2	MutB	r2	/home/$USER/Research/proteinID/MutB/r2	ProteinID_MutB
-MutB/r3	MutB	r3	/home/$USER/Research/proteinID/MutB/r3	ProteinID_MutB
+Path	System	Replicate	Parm_Path	Sys_Tag	Start_Prod_Range	End_Prod_Range	Sim_Time
+WT/r1	WT	r1	/home/$USER/Research/proteinID/WT/r1	ProteinID_WT	20	520	500
+WT/r2	WT	r2	/home/$USER/Research/proteinID/WT/r2	ProteinID_WT	20	520	500
+WT/r3	WT	r3	/home/$USER/Research/proteinID/WT/r3	ProteinID_WT	20	520	500
+MutA/r1	MutA	r1	/home/$USER/Research/proteinID/MutA/r1	ProteinID_MutA	25	325	300
+MutA/r2	MutA	r2	/home/$USER/Research/proteinID/MutA/r2	ProteinID_MutA	25	325	300
+MutA/r3	MutA	r3	/home/$USER/Research/proteinID/MutA/r3	ProteinID_MutA	25	325	300
+MutB/r1	MutB	r1	/home/$USER/Research/proteinID/MutB/r1	ProteinID_MutB	50	350	300
+MutB/r2	MutB	r2	/home/$USER/Research/proteinID/MutB/r2	ProteinID_MutB	50	350	300
+MutB/r3	MutB	r3	/home/$USER/Research/proteinID/MutB/r3	ProteinID_MutB	50	350	300

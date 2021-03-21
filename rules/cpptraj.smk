@@ -13,35 +13,48 @@ rule cpptraj_analysis:
               sys_rep_dir, values in systems.items() for value in values],
         cpp = [f"analysis/{sys_rep_dir}/cpptraj{fs}analysis.in" for
                sys_rep_dir, values in systems.items() for value in values],
-        prm = [f"{value[2]}/{tag}{fs}{value[0]}{post_e}.prmtop" for
-            sys_rep_dir, values in systems.items() for value in values],
-        inp = [f"{value[2]}/{tag}{fs}{value[0]}{post_e}.inpcrd" for
-            sys_rep_dir, values in systems.items() for value in values],
-        nc = [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}imaged{fs}{p1}-{p2}.nc" for
-              sys_rep_dir, values in systems.items() for value in values]
+        prm = [f"{parm_path}/{sys_tag}.prmtop" for
+            sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        inp = [f"{parm_path}/{sys_tag}.inpcrd" for
+            sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        nc = [f"analysis/{sys_rep_dir}/{sys_tag}{fs}imaged{fs}{prod1}-{prod2}.nc" for
+              sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values]
     output:
         [f"analysis/{sys_rep_dir}/test{fs}rms.dat" for
          sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}corr{fs}mat.dat" for
-         sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}covar{fs}mat.dat" for
-         sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}evecs.out" for
-         sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}100.nmd" for
-         sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}hbond{fs}avg.dat" for
-         sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}hbond.dat" for
-         sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}total{fs}bb{fs}rms.dat" for
-         sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}rmsd{fs}byres.dat" for
-         sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}rmsf{fs}byres.dat" for
-         sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}secstruct.gnu" for
-         sys_rep_dir, values in systems.items() for value in values]
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}corr{fs}mat.dat" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}covar{fs}mat.dat" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}evecs.out" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}100.nmd" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}hbond{fs}avg.dat" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}hbond.dat" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}total{fs}bb{fs}rms.dat" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}rmsd{fs}byres.dat" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}rmsf{fs}byres.dat" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}secstruct.gnu" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
     run:
         for key, values in systems.items():
             shell("""
@@ -65,13 +78,16 @@ rule cpptraj_strip:
               sys_rep_dir, values in systems.items() for value in values],
         cpp = [f"analysis/{sys_rep_dir}/cpptraj{fs}strip.in" for
               sys_rep_dir, values in systems.items() for value in values],
-        prm = [f"{value[2]}/{tag}{fs}{value[0]}{post_e}.prmtop" for
-            sys_rep_dir, values in systems.items() for value in values]
+        prm = [f"{parm_path}/{sys_tag}.prmtop" for
+            sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
     output:
-        nc = [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}imaged{fs}{p1}-{p2}.nc" for
-              sys_rep_dir, values in systems.items() for value in values],
-        mdcrd = [f"analysis/EDA/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}{p1}-{p2}.mdcrd" for
-         sys_rep_dir, values in systems.items() for value in values]
+        nc = [f"analysis/{sys_rep_dir}/{sys_tag}{fs}imaged{fs}{prod1}-{prod2}.nc" for
+              sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        mdcrd = [f"analysis/EDA/{sys_rep_dir}/{sys_tag}{fs}{prod1}-{prod2}.mdcrd" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
     run:
         for key in systems.keys():
             shell("""
@@ -103,13 +119,13 @@ rule cpptraj_write:
          sys_rep_dir, values in systems.items() for value in values]
     run:
     # python3 script alloc replicate
-    #  prm_path sys_tag
-    #  file_ext start_range end_range mask file_sep
+    #  prm_path traj_tag file_ext output_tag
+    #   start_range end_range mask file_sep cwd system num_AAs
     # Mask is {x}-{x}
         for key, values in systems.items():
-            for value in values:
+            for system, replicate, parm_path, sys_tag, prod1, prod2, sim_time in values:
                 shell("""
                 cd {cwd}/analysis/{key}
-                python3 {cwd}/{input.script} {que} {value[1]} \
-{value[2]} {tag}{fs}{value[0]} \
-{t_ext} {p1} {p2} {start_res}-{end_res} {fs} {cwd} {value[0]} {n_aa}""")
+                python3 {cwd}/{input.script} {que} {replicate} \
+{parm_path} {sys_tag} {t_ext} {proj_tag}{fs}{system} \
+{prod1} {prod2} {start_res}-{end_res} {fs} {cwd} {system} {n_aa}""")

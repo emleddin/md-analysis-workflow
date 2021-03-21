@@ -16,7 +16,8 @@ cwd = os.getcwd()
 # Read the table of systems and turn into a dictionary
 # Note: The [] around the tuple are VERY IMPORTANT for indexing
 systems_df = pd.read_csv(config["SYSTEMS"], sep='\t')
-systems = dict([(t.Path, [(t.System, t.Replicate, t.Parm_Path, t.Sys_Tag)])
+systems = dict([(t.Path, [(t.System, t.Replicate, t.Parm_Path, t.Sys_Tag,
+                           t.Start_Prod_Range, t.End_Prod_Range, t.Sim_Time)])
                 for t in systems_df.itertuples()])
 
 # Read the table of EDA values and turn into a dictionary
@@ -33,8 +34,7 @@ eda_comps = dict([(t.SysA_SysB, [(t.SystemA, t.A_Path, t.SystemB, t.B_Path)])
 
 # Set the config variables as shorthand
 fs = config["F_SEP"]
-tag = config["PROJ_TAG"]
-post_e = config["PROJ_PE"]
+proj_tag = config["PROJ_TAG"]
 qsub = config["SUB_C"]
 t_ext = config["CUR_TRAJ_EXT"]
 que = config["QUEUE"]
@@ -42,10 +42,7 @@ que = config["QUEUE"]
 start_res = config["START_RES_RANGE"]
 end_res = config["END_RES_RANGE"]
 n_aa = config["NUM_AA"]
-p1 = config["START_PROD_RANGE"]
-p2 = config["END_PROD_RANGE"]
 div = config["TIME_DIVIDER"]
-sim_time = config["SIM_TIME"]
 roi = config["ROI"]
 
 # --------------------------------- Functions ---------------------------------#
@@ -77,7 +74,7 @@ def get_val(var, sys_dict = systems, eda_dict = eda_vals):
         val = eda_dict.get(key)[var]
     return val
 
-def get_crd(sys_dict = systems, file_sep = fs, sys_tag = tag, prod1 = p1, prod2 = p2):
+def get_crd(sys_dict = systems, file_sep = fs):
     """Get values of mdcrd for the EDA input file based on the system/replicate.
 
     Parameters
@@ -87,8 +84,6 @@ def get_crd(sys_dict = systems, file_sep = fs, sys_tag = tag, prod1 = p1, prod2 
         systems.tsv file.
     file_sep : str
         Determines the separator to use for the file name.
-    sys_tag : str
-        Specifies the inital title information for the output mdcrd.
     prod1 : int
         Initial value of the production trajectory files for clear labelling.
     prod2 : int
@@ -104,8 +99,8 @@ def get_crd(sys_dict = systems, file_sep = fs, sys_tag = tag, prod1 = p1, prod2 
     This function is critical for looping through the rule correctly.
     """
     for key, values in sys_dict.items():
-        for value in values:
-            crd = (f"{sys_tag}{file_sep}{value[0]}{file_sep}{prod1}-{prod2}.mdcrd")
+        for system, replicate, parm_path, sys_tag, prod1, prod2, sim_time in values:
+            crd = (f"{sys_tag}{file_sep}{prod1}-{prod2}.mdcrd")
     return crd
 
 

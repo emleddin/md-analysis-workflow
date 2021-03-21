@@ -21,13 +21,11 @@ rule all:
     input:
         # `systems`
         # Key = the output path
-        # value[0] = system
-        # value[1] = replicate
-        # value[2] = prm_path
-        # value[3] = system tag
+        # values = system, replicate, parm_path, sys_tag, prod1, prod2, sim_time
         # Prmtop is required for everything
-        [f"{value[2]}/{tag}{fs}{value[0]}{post_e}.prmtop" for
-            sys_rep_dir, values in systems.items() for value in values],
+        [f"{parm_path}/{sys_tag}.prmtop" for
+            sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
         # Cpptraj input files
         [f"analysis/{sys_rep_dir}/cpptraj{fs}strip.sh" for
          sys_rep_dir, values in systems.items() for value in values],
@@ -38,31 +36,42 @@ rule all:
         [f"analysis/{sys_rep_dir}/cpptraj{fs}analysis.in" for
          sys_rep_dir, values in systems.items() for value in values],
         # Cpptraj output files
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}imaged{fs}{p1}-{p2}.nc" for
-              sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/EDA/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}{p1}-{p2}.mdcrd" for
-         sys_rep_dir, values in systems.items() for value in values],
+        [f"analysis/{sys_rep_dir}/{sys_tag}{fs}imaged{fs}{prod1}-{prod2}.nc" for
+              sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/EDA/{sys_rep_dir}/{sys_tag}{fs}{prod1}-{prod2}.mdcrd" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
         # Cpptraj analysis files
         [f"analysis/{sys_rep_dir}/test{fs}rms.dat" for
          sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}corr{fs}mat.dat" for
-         sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}covar{fs}mat.dat" for
-         sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}evecs.out" for
-         sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}100.nmd" for
-         sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}hbond{fs}avg.dat" for
-         sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}hbond.dat" for
-         sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}total{fs}bb{fs}rms.dat" for
-         sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}rmsd{fs}byres.dat" for
-         sys_rep_dir, values in systems.items() for value in values],
-        [f"analysis/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}rmsf{fs}byres.dat" for
-         sys_rep_dir, values in systems.items() for value in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}corr{fs}mat.dat" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}covar{fs}mat.dat" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}evecs.out" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}100.nmd" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}hbond{fs}avg.dat" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}hbond.dat" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}total{fs}bb{fs}rms.dat" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}rmsd{fs}byres.dat" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/{sys_rep_dir}/{proj_tag}{fs}{system}{fs}rmsf{fs}byres.dat" for
+         sys_rep_dir, values in systems.items() for system, replicate, \
+                        parm_path, sys_tag, prod1, prod2, sim_time in values],
         # `eda_vals`
         # Key = the output path
         # value[0] = NRES
@@ -84,31 +93,37 @@ rule all:
         # [f"analysis/EDA/{sys_rep_dir}/fort.806" for
         #  sys_rep_dir in systems.keys()]
         # EDA Averaging
-        [f"analysis/EDA/{value[0]}/{tag}{fs}{value[0]}{fs}EDA{fs}res{roi}{fs}coul{fs}avg.dat" for
-         key, values in systems.items() for value in values],
-        [f"analysis/EDA/{value[0]}/{tag}{fs}{value[0]}{fs}EDA{fs}res{roi}{fs}vdw{fs}avg.dat" for
-         key, values in systems.items() for value in values],
-        [f"analysis/EDA/{value[0]}/{tag}{fs}{value[0]}{fs}EDA{fs}res{roi}{fs}tot{fs}avg.dat" for
-         key, values in systems.items() for value in values],
+        [f"analysis/EDA/{system}/{proj_tag}{fs}{system}{fs}EDA{fs}res{roi}{fs}coul{fs}avg.dat" for
+         key, values in systems.items() for system, replicate, parm_path, \
+                                    sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/EDA/{system}/{proj_tag}{fs}{system}{fs}EDA{fs}res{roi}{fs}vdw{fs}avg.dat" for
+         key, values in systems.items() for system, replicate, parm_path, \
+                                    sys_tag, prod1, prod2, sim_time in values],
+        [f"analysis/EDA/{system}/{proj_tag}{fs}{system}{fs}EDA{fs}res{roi}{fs}tot{fs}avg.dat" for
+         key, values in systems.items() for system, replicate, parm_path, \
+                                    sys_tag, prod1, prod2, sim_time in values],
         # EDA Differences
-        [f"analysis/EDA/{tag}{fs}{value[0]}-{value[2]}{fs}total{fs}interaction{fs}res{roi}{fs}avg.dat"
+        [f"analysis/EDA/{proj_tag}{fs}{value[0]}-{value[2]}{fs}total{fs}interaction{fs}res{roi}{fs}avg.dat"
          for comparison, values in eda_comps.items() for value in values],
         # Matrix Correlation
-        [f"analysis/MatCorr/{tag}{fs}{value[0]}{fs}{value[1]}{fs}mat{fs}corr.png" for
-         key, values in systems.items() for value in values],
+        [f"analysis/MatCorr/{proj_tag}{fs}{system}{fs}{replicate}{fs}mat{fs}corr.png" for
+         key, values in systems.items() for system, replicate, parm_path, \
+                                    sys_tag, prod1, prod2, sim_time in values],
         # Normal Modes
-        [f"analysis/NMA/{tag}{fs}{value[0]}{fs}{value[1]}{fs}NMA.png" for
-         key, values in systems.items() for value in values],
+        [f"analysis/NMA/{proj_tag}{fs}{system}{fs}{replicate}{fs}NMA.png" for
+         key, values in systems.items() for system, replicate, parm_path, \
+                                    sys_tag, prod1, prod2, sim_time in values],
         # RMS Images
-        [f"analysis/RMS/{tag}{fs}{systems_df.groupby('System')['Replicate'].apply(list).index[i]}-rmsds.png"
+        [f"analysis/RMS/{proj_tag}{fs}{systems_df.groupby('System')['Replicate'].apply(list).index[i]}-rmsds.png"
          for i in range(len(systems_df.groupby("System")["Replicate"].apply(list)))],
-        [f"analysis/RMS/{tag}{fs}{systems_df.groupby('System')['Replicate'].apply(list).index[i]}-rmsf.png"
+        [f"analysis/RMS/{proj_tag}{fs}{systems_df.groupby('System')['Replicate'].apply(list).index[i]}-rmsf.png"
          for i in range(len(systems_df.groupby("System")["Replicate"].apply(list)))],
-        [f"analysis/RMS/{tag}{fs}{systems_df.groupby('System')['Replicate'].apply(list).index[i]}-hbonds.png"
+        [f"analysis/RMS/{proj_tag}{fs}{systems_df.groupby('System')['Replicate'].apply(list).index[i]}-hbonds.png"
          for i in range(len(systems_df.groupby("System")["Replicate"].apply(list)))],
         # Secondary Structure
-        [f"analysis/2SA/{tag}{fs}{value[0]}{fs}{value[1]}{fs}2SA.png" for
-         key, values in systems.items() for value in values]
+        [f"analysis/2SA/{proj_tag}{fs}{system}{fs}{replicate}{fs}2SA.png" for
+         key, values in systems.items() for system, replicate, parm_path, \
+                                    sys_tag, prod1, prod2, sim_time in values]
 
 
 rule help:

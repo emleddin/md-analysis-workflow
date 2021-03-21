@@ -8,21 +8,20 @@ import sys
 alloc = sys.argv[1]
 system = sys.argv[2]
 replicate = sys.argv[3]
-sys_tag = sys.argv[4]
+traj_tag = sys.argv[4]
 n_res = int(sys.argv[5])
 n_atom = int(sys.argv[6])
 n_prot_at = sys.argv[7]
 tot_residues = sys.argv[8]
 nas_traj = sys.argv[9]
 fs = sys.argv[10]
-short_tag = sys.argv[11]
 
 sh_file = ("EDA"+str(fs)+"job.sh")
 inp_file = "EDA.inp"
 ans_file = "ans.txt"
 
 
-def write_eda_bash(outfile, queue, rep, tag, ans):
+def write_eda_bash(outfile, queue, rep, sys, ans):
     """Creates the PBS script for submitting EDA jobs.
 
     Parameters
@@ -51,7 +50,7 @@ def write_eda_bash(outfile, queue, rep, tag, ans):
     f.write("#PBS -j oe\n")
     f.write("#PBS -r n\n")
     f.write("#PBS -o EDA.error\n")
-    f.write(f"#PBS -N {rep}.{tag}.E\n\n")
+    f.write(f"#PBS -N EDA.{rep}.{sys}\n\n")
     f.write("# Load in the Intel compiler\n")
     f.write("module load intel/17.0\n\n")
     f.write("# Access the folder where the files are\n")
@@ -134,6 +133,6 @@ def write_eda_inp(outfile, n_residues, tot_atom, prot_at, tot_res, traj):
     f.write(f"{traj}")
 
 
-write_eda_bash(sh_file, alloc, replicate, short_tag, ans_file)
-write_eda_ans(ans_file, inp_file, sys_tag)
+write_eda_bash(sh_file, alloc, replicate, system, ans_file)
+write_eda_ans(ans_file, inp_file, traj_tag)
 write_eda_inp(inp_file, n_res, n_atom, n_prot_at, tot_residues, nas_traj)

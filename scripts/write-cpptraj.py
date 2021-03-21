@@ -1,21 +1,22 @@
 import sys
 
-# python write-cpptraj.py alloc replicate full_path tag file_ext start_range end_range
-# mask file_sep
-# Ex: python write-cpptraj.py gac.cpu r1 ../test thing mdcrd 22 30 1-476 - 450
+# python write-cpptraj.py alloc replicate full_path traj_tag file_ext
+# output_tag start_range end_range mask file_sep
+# Ex: python write-cpptraj.py gac.cpu r1 ../test thing mdcrd thing_sys 22 30 1-476 - 450
 # script_name = sys.argv[0]
 alloc = sys.argv[1]
 replicate = sys.argv[2]
 full_path = sys.argv[3]
-sys_tag = sys.argv[4]
+traj_tag = sys.argv[4]
 file_ext = sys.argv[5]
-start_range = int(sys.argv[6])
-end_range = int(sys.argv[7])
-mask = sys.argv[8]
-fs = sys.argv[9]
-work_dir = sys.argv[10]
-system = sys.argv[11]
-n_aa = int(sys.argv[12])
+output_tag = sys.argv[6]
+start_range = int(sys.argv[7])
+end_range = int(sys.argv[8])
+mask = sys.argv[9]
+fs = sys.argv[10]
+work_dir = sys.argv[11]
+system = sys.argv[12]
+n_aa = int(sys.argv[13])
 
 # Remove the trailing slash on a path, if present
 full_path = full_path.rstrip('/')
@@ -27,7 +28,7 @@ sh_analy = ('cpptraj'+str(fs)+'analysis.sh')
 out_analy = ('cpptraj'+str(fs)+'analysis.in')
 
 
-def write_strip_bash(outfile, queue, rep, f_path, cpp_strip, tag):
+def write_strip_bash(outfile, queue, rep, f_path, cpp_strip, tag, sys):
     """Creates the PBS script for submitting cpptraj strip jobs.
 
     Parameters
@@ -43,8 +44,9 @@ def write_strip_bash(outfile, queue, rep, f_path, cpp_strip, tag):
     cpp_strip : str
         The name of the cpptraj strip file that will be submitted.
     tag : str
-        The tag used in the file names. This should be comprised of
-        the project ID and system.
+        The tag used for the trajectory and input files.
+    sys : str
+        The system to make the analysis for.
 
     Returns
     -------
@@ -59,7 +61,7 @@ def write_strip_bash(outfile, queue, rep, f_path, cpp_strip, tag):
     f.write("#PBS -j oe\n")
     f.write("#PBS -r n\n")
     f.write("#PBS -o err.error\n")
-    f.write(f"#PBS -N {rep}.{tag}.S\n\n")
+    f.write(f"#PBS -N CS.{rep}.{sys}\n\n")
     f.write(f"prmfile={f_path}/{tag}.prmtop\n")
     f.write(f"cppfile={cpp_strip}\n\n")
     f.write("cd $PBS_O_WORKDIR\n")
@@ -84,7 +86,7 @@ def write_strip_traj(outfile, file_sep, f_path, tag, f_ext, f_start, f_end,
     f_path : str
         The full path to the trajectory files (parm_path).
     tag : str
-        Specifies the inital title information for the output files.
+        The tag used for the trajectory and input files.
     f_ext : str
         Current file extension used for trajectory files (ex. mdcrd or nc).
     f_start : int
@@ -115,7 +117,7 @@ def write_strip_traj(outfile, file_sep, f_path, tag, f_ext, f_start, f_end,
     f.close()
 
 
-def write_analy_bash(outfile, queue, rep, cpp_analy, tag):
+def write_analy_bash(outfile, queue, rep, cpp_analy, tag, sys):
     """Creates the PBS script for submitting cpptraj analysis jobs.
 
     Parameters
@@ -129,8 +131,9 @@ def write_analy_bash(outfile, queue, rep, cpp_analy, tag):
     cpp_analy : str
         The name of the cpptraj analysis file that will be submitted.
     tag : str
-        The tag used in the file names. This should be comprised of
-        the project ID and system.
+        The tag used for the trajectory and input files.
+    sys : str
+        The system to make the analysis for.
 
     Returns
     -------
@@ -145,7 +148,7 @@ def write_analy_bash(outfile, queue, rep, cpp_analy, tag):
     f.write("#PBS -j oe\n")
     f.write("#PBS -r n\n")
     f.write("#PBS -o err.error\n")
-    f.write(f"#PBS -N {rep}.{tag}.A\n\n")
+    f.write(f"#PBS -N CA.{rep}.{sys}\n\n")
     f.write(f"prmfile=strip.{tag}.prmtop\n")
     f.write(f"cppfile={cpp_analy}\n\n")
     f.write("cd $PBS_O_WORKDIR\n")
@@ -156,7 +159,8 @@ def write_analy_bash(outfile, queue, rep, cpp_analy, tag):
     f.close()
 
 
-def write_analy_traj(outfile, fs, f_path, tag, f_start, f_end, num_aa, res_mask):
+def write_analy_traj(outfile, fs, f_path, sys_tag, f_start, f_end,
+                     num_aa, res_mask, out_tag):
     """Creates the input file used for analysis with cpptraj.
 
     Parameters
@@ -167,7 +171,7 @@ def write_analy_traj(outfile, fs, f_path, tag, f_start, f_end, num_aa, res_mask)
         Determines the separator to use for the file name.
     f_path : str
         The full path to the trajectory files (parm_path).
-    tag : str
+    out_tag : str
         Specifies the inital title information for the output files.
     f_start : int
         The number associated with the first trajectory file to read in.
@@ -177,6 +181,8 @@ def write_analy_traj(outfile, fs, f_path, tag, f_start, f_end, num_aa, res_mask)
         Number of amino acids in the system for secondary structure analysis.
     res_mask : str
         The residue mask for specific analyses.
+    sys_tag : str
+        The tag used for the trajectory and input files.
 
     Returns
     -------
@@ -187,40 +193,41 @@ def write_analy_traj(outfile, fs, f_path, tag, f_start, f_end, num_aa, res_mask)
     f.write("# Read in the crystal (pre-minimization) structure\n")
     f.write("# You need to specify a prmtop with it because you're reading in\n")
     f.write("# the stripped trajectory\n")
-    f.write(f"parm {f_path}/{tag}.prmtop [ref]\n")
-    f.write(f"reference {f_path}/{tag}.inpcrd parm [ref]\n")
+    f.write(f"parm {f_path}/{sys_tag}.prmtop [ref]\n")
+    f.write(f"reference {f_path}/{sys_tag}.inpcrd parm [ref]\n")
     f.write("\n")
     f.write("# Read in the stripped trajectory\n")
-    f.write(f"trajin {tag}{fs}imaged{fs}{f_start}-{f_end}.nc\n")
+    f.write(f"trajin {sys_tag}{fs}imaged{fs}{f_start}-{f_end}.nc\n")
     f.write("\n")
     f.write("autoimage\n\n")
     f.write(f"rms reference out test{fs}rms.dat :{res_mask} byres\n\n")
     f.write("# Get for correlation matrix (evecs = eigenvectors)\n")
-    f.write(f"matrix out {tag}{fs}corr{fs}mat.dat name corr_mat byres :{res_mask} correl\n\n")
+    f.write(f"matrix out {out_tag}{fs}corr{fs}mat.dat name corr_mat byres :{res_mask} correl\n\n")
     f.write("# Get for normal modes\n")
-    f.write(f"matrix out {tag}{fs}covar{fs}mat.dat name norm_mode :{res_mask}@CA,P,C4',C2 \\\n")
+    f.write(f"matrix out {out_tag}{fs}covar{fs}mat.dat name norm_mode :{res_mask}@CA,P,C4',C2 \\\n")
     f.write(" covar\n")
-    f.write(f"diagmatrix norm_mode out {tag}{fs}evecs.out vecs 100 reduce \\\n")
-    f.write(f" nmwiz nmwizvecs 100 nmwizfile {tag}{fs}100.nmd \\\n")
+    f.write(f"diagmatrix norm_mode out {out_tag}{fs}evecs.out vecs 100 reduce \\\n")
+    f.write(f" nmwiz nmwizvecs 100 nmwizfile {out_tag}{fs}100.nmd \\\n")
     f.write(f" nmwizmask :{res_mask}@CA,P,C4',C2\n\n")
-    f.write(f"hbond out {tag}{fs}hbond.dat dist 3.0 \\\n")
-    f.write(f" avgout {tag}{fs}hbond{fs}avg.dat\n\n")
-    f.write(f"rms reference out {tag}{fs}total{fs}bb{fs}rms.dat \\\n")
+    f.write(f"hbond out {out_tag}{fs}hbond.dat dist 3.0 \\\n")
+    f.write(f" avgout {out_tag}{fs}hbond{fs}avg.dat\n\n")
+    f.write(f"rms reference out {out_tag}{fs}total{fs}bb{fs}rms.dat \\\n")
     f.write(f" :{res_mask}@CA,P,O3',O5',C3',C4',C5'\n")
     f.write(f"rmsd :{res_mask} reference perres perresavg range {res_mask} \\\n")
-    f.write(f" perresout {tag}{fs}rmsd{fs}byres.dat\n\n")
-    f.write(f"atomicfluct :{res_mask} out {tag}{fs}rmsf{fs}byres.dat byres\n")
-    f.write(f"secstruct :1-{num_aa} out {tag}{fs}secstruct.gnu\n")
-    f.write(f"#distance :AAA@PA :BBB@O3' out {tag}{fs}dist{fs}PO{fs}WT.dat\n\n")
+    f.write(f" perresout {out_tag}{fs}rmsd{fs}byres.dat\n\n")
+    f.write(f"atomicfluct :{res_mask} out {out_tag}{fs}rmsf{fs}byres.dat byres\n")
+    f.write(f"secstruct :1-{num_aa} out {out_tag}{fs}secstruct.gnu\n")
+    f.write(f"#distance :AAA@PA :BBB@O3' out {out_tag}{fs}dist{fs}PO{fs}WT.dat\n\n")
     f.close()
 
 
 # Write the stripped files
-write_strip_bash(sh_strip, alloc, replicate, full_path, out_strip, sys_tag)
-write_strip_traj(out_strip, fs, full_path, sys_tag, file_ext, start_range,
+write_strip_bash(sh_strip, alloc, replicate, full_path, out_strip, traj_tag,
+                 system)
+write_strip_traj(out_strip, fs, full_path, traj_tag, file_ext, start_range,
                  end_range, work_dir, system, replicate)
 
 # Write the analysis files
-write_analy_bash(sh_analy, alloc, replicate, out_analy, sys_tag)
-write_analy_traj(out_analy, fs, full_path, sys_tag, start_range, end_range,
-                 n_aa, mask)
+write_analy_bash(sh_analy, alloc, replicate, out_analy, traj_tag, system)
+write_analy_traj(out_analy, fs, full_path, traj_tag, start_range, end_range,
+                 n_aa, mask, output_tag)

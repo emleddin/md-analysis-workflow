@@ -182,41 +182,41 @@ the system will need to be converted to a PDB to determine `NRES` and `TOTRES`.
 
 ## :warning: File Naming Warning :warning:
 
- You MUST have consistent file naming across all systems and replicates!!
- **THIS IS CRUCIAL TO THE WORKFLOW!!!!!**
- You can modify the scripts a little bit, but it's set up for stuff like this:
-- Prmtop: `{tag}{fs}{system}{post_e}.prmtop`
+You MUST have consistent file naming for the prmtop, inpcrd, and trajectory
+files!
+**THIS IS CRUCIAL TO THE WORKFLOW!!!!!**
+The `Sys_Tag` is specified in the `config/systems.tsv` file.
+You can modify the scripts a little bit, but it's set up for stuff like this:
+- Prmtop: `{Sys_Tag}.prmtop`
   - Ex reps 1: crambin-WT-wat.prmtop, crambin-H39C-wat.prmtop
   - Ex reps 2: crambin_WT.prmtop, crambin_H39C.prmtop
-
-
-- Inpcrd: `{tag}{fs}{system}{post_e}.inpcrd`
+  
+- Inpcrd: `{Sys_Tag}.inpcrd`
   - Ex reps 1: crambin-WT-wat.inpcrd, crambin-H39C-wat.inpcrd
   - Ex reps 2: crambin_WT.inpcrd, crambin_H39C.inpcrd
 
 
-- Traj (mdcrd/nc): `{tag}{fs}{system}{post_e}{fs}md{num}.{f_ext}`
+- Traj (mdcrd/nc): `{Sys_Tag}{fs}md{num}.{f_ext}`
   - Ex reps 1: crambin-WT-wat-md50.mdcrd, crambin-H39C-wat-md50.mdcrd
   - Ex reps 2: crambin_WT_md50.nc, crambin_H39C_md50.nc
 
 | Variable      | Explanation                                                          |
 | ------------- |----------------------------------------------------------------------|
-| `tag`         | The project identifier for a file, to keep things findable.          |
+| `Sys_Tag`     | The project identifier for a system/replicate.                       |
 | `fs`          | A file separator. Common examples are `-`, `_`, and `.`              |
 | `system`      | What system the files are for (like wild type or a specific mutant). |
-| `post_e`      | A pre-extension. Often these are used to specify solvation.          |
 | `num`         | The number of the trajectory file, since we write in short chunks.   |
 | `f_ext`       | The file extension type. You might save using `nc` or `mdcrd`.       |
 
- Basically, don't interchange between the examples.
- If you did, you'll want to rename all your files SAFELY.
- Do NOT think *"oh this loop is safe"* without testing it **AWAY** from your
- data first!!!
- You may think it'll work fine, but that's a really easy way to overwrite or
- delete your data in 10 seconds.
+Basically, don't interchange between the examples.
+If you did, you'll want to rename all your files SAFELY.
+Do NOT think *"oh this loop is safe"* without testing it **AWAY** from your
+data first!!!
+You may think it'll work fine, but that's a really easy way to overwrite or
+delete your data in 10 seconds.
 
-The `rename` command (which doesn't exist in all systems...) can be useful
-for doing this.
+The `rename` command (which doesn't exist on all operating systems...) can be 
+useful for doing this.
 It takes the current naming you want to switch, the thing you want to switch
 it to, and the files it should be applied to as arguments.
 
@@ -234,6 +234,11 @@ $ ls
 proteinID-WT-wat.inpcrd  proteinID-WT-wat-md2.nc  proteinID-WT-wat.prmtop
 proteinID-WT-wat-md1.nc  proteinID-WT-wat-md3.nc
 ```
+
+If you used `prod` or didn't use a word to specify production in your 
+trajectory files, you may opt to remove the `md` specifier in the scripts and 
+files, but it can be a pain.
+Using `rename` is certainly easier.
 
 ## Using Snakemake
 

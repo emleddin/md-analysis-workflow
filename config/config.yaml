@@ -1,8 +1,28 @@
 # Define the other configuration files (tab separated values)
 # These files must have the columns below unless you want to modify many things
-# SYSTEMS: Path	System	Replicate	Parm_Path	Sys_Tag
-# EDAVALS: Path	NRES	NATOM	NPROTAT	TOTRES
-# EDACOMPS: SysA-SysB	SystemA	A_Path	SystemB	B_Path
+#-----------------------------------------------------------------------------#
+# SYSTEMS:
+# Path	System	Replicate	Parm_Path	Sys_Tag Start_Prod_Range
+# End_Prod_Range	Sim_Time
+# ---------
+# Path: the path within the analysis directory created by the workflow.
+#  It should be system/replicate.
+# System: the system to analyze.
+# Replicate: which replicate to use.
+# Parm_Path: the path to the prmtop, inpcrd, and trajectory files
+# Sys_Tag: how the associated prmtop, inpcrd, and trajectory information is
+#  named. BLAH.prmtop, BLAH.inpcrd, BLAH{F_SEP}md1.mdcrd or BLAH{F_SEP}md1.nc
+# Start_Prod_Range and End_Prod_Range: the production frames for the
+#  trajectory labels (ex: 25-350 as ns)
+# Sim_Time: the expected amount of simulation time to use for the graphs,
+# in nano seconds. This should probably be End_Prod_Range - Start_Prod_Range
+#-----------------------------------------------------------------------------#
+# EDAVALS:
+# Path	NRES	NATOM	NPROTAT	TOTRES
+#-----------------------------------------------------------------------------#
+# EDACOMPS:
+# SysA-SysB	SystemA	A_Path	SystemB	B_Path
+#-----------------------------------------------------------------------------#
 
 SYSTEMS: "config/systems.tsv"
 EDAVALS: "config/EDAvalues.tsv"
@@ -11,25 +31,13 @@ EDACOMPS: "config/EDAcompare.tsv"
 #---------------------------------- Overall ----------------------------------#
 
 # Project identifier
-# Files will be written as {PROJ_TAG}{F_SEP}{SYS}
-#  (sometimes {PROJ_TAG}{F_SEP}{SYS}{F_SEP}{REP})
+# Most output files will be {PROJ_TAG}{F_SEP}{SYSTEM}
+#  (sometimes {PROJ_TAG}{F_SEP}{SYSTEM}{F_SEP}{REPLICATE})
 # If you value consistency, make sure you use the same F_SEP here
 PROJ_TAG: "ProteinID"
 
 F_SEP: "_" # underscore
 #F_SEP: "-" # dash
-
-# Project pre-extension (optional)
-# This is in case you add something like a solvent label to your files
-# So you can have {PROJ_TAG}{F_SEP}{SYS}{PROJ_EPE}
-# NOTE: Because this is optional, you need to add the appropriate
-# filename separator here
-# Ex:
-# PROJ_TAG = crambin, F_SEP = _, SYS = WT, PROJ_PE = _wat
-# creates the prmtop: crambin_WT_wat.prmtop
-# Using "" for PROJ_PE would instead give `crambin_WT.prmtop`
-#PROJ_PE: "_wat"
-PROJ_PE: "" # Use for none
 
 # The name of the PBS queue
 QUEUE: "my_cpu_alloc"
@@ -49,18 +57,10 @@ END_RES_RANGE: "392"
 # The number of amino acids for the secondary structure analysis (ex: 1-430)
 NUM_AA: "430"
 
-# The production frames for the trajectory labels (ex: 25-350 as ns)
-START_PROD_RANGE: "25"
-END_PROD_RANGE: "350"
-
 # The divisor to use for the RMSD graphs to get the of frames per nanosecond.
 # Typically, if you use Langevin this is 100, and 500 for Berendsen.
 # This will be put in the gnuplot script as ($1/(TIME_DIVIDER)).
 TIME_DIVIDER: "100"
-
-# The expected amount of simulation time to use for the graphs, in nano seconds.
-# This should probably be END_PROD_RANGE - START_PROD_RANGE
-SIM_TIME: "325"
 
 # Residue of interest for EDA.
 # The interaction of every residue with this residue, with the exception of
