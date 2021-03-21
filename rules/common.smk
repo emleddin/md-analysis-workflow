@@ -46,64 +46,6 @@ div = config["TIME_DIVIDER"]
 roi = config["ROI"]
 
 # --------------------------------- Functions ---------------------------------#
-
-def get_val(var, sys_dict = systems, eda_dict = eda_vals):
-    """Get values for the EDA input file based on the system/replicate.
-
-    Parameters
-    ----------
-    var : int
-        The column index variable for the converted EDA dictionary.
-    sys_dict : dict
-        Dictionary of system and replicate info generated from the
-        systems.tsv file.
-    eda_dict : dict
-        Dictionary of EDA atom and residue info generated from the
-        EDAvalues.tsv file.
-
-    Returns
-    -------
-    val : str
-        The associated value from the eda_dict.
-
-    Notes
-    -----
-    This function is critical for looping through the rule correctly.
-    """
-    for key in sys_dict.keys():
-        val = eda_dict.get(key)[var]
-    return val
-
-def get_crd(sys_dict = systems, file_sep = fs):
-    """Get values of mdcrd for the EDA input file based on the system/replicate.
-
-    Parameters
-    ----------
-    sys_dict : dict
-        Dictionary of system and replicate info generated from the
-        systems.tsv file.
-    file_sep : str
-        Determines the separator to use for the file name.
-    prod1 : int
-        Initial value of the production trajectory files for clear labelling.
-    prod2 : int
-        Final value of the production trajectory files for clear labelling.
-
-    Returns
-    -------
-    crd : str
-        The relative path and name of the EDA mdcrd.
-
-    Notes
-    -----
-    This function is critical for looping through the rule correctly.
-    """
-    for key, values in sys_dict.items():
-        for system, replicate, parm_path, sys_tag, prod1, prod2, sim_time in values:
-            crd = (f"{sys_tag}{file_sep}{prod1}-{prod2}.mdcrd")
-    return crd
-
-
 def gnuplot_rms(outfile, tag, fs, div, start_residue, end_residue, sys, files):
     """Create a gnuplot script for plotting RMSD, RMSF, and number of hbonds
     for all replicates of a system.

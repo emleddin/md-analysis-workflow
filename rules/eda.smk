@@ -141,12 +141,7 @@ rule eda_write:
         # mdcrd = [f"analysis/EDA/{sys_rep_dir}/{tag}{fs}{value[0]}{fs}{p1}-{p2}.mdcrd" for
         #  sys_rep_dir, values in systems.items() for value in values],
     params:
-        alloc = que,
-        n_res = get_val(0),
-        n_atom = get_val(1),
-        n_prot_at = get_val(2),
-        tot_res = get_val(3),
-        #mdcrd = get_crd()
+        alloc = que
     output:
         script = [f"analysis/EDA/{sys_rep_dir}/EDA{fs}job.sh" for
          sys_rep_dir, values in systems.items() for value in values],
@@ -161,11 +156,15 @@ rule eda_write:
     # n_res n_atom n_prot_at tot_residues \
     # nas_traj fs
         for key, values in systems.items():
+            n_res = eda_vals.get(key)[0]
+            n_atom = eda_vals.get(key)[1]
+            n_prot_at = eda_vals.get(key)[2]
+            tot_res = eda_vals.get(key)[3]
             for system, replicate, parm_path, sys_tag, prod1, prod2, sim_time in values:
                 shell("""
                 cd {cwd}/analysis/EDA/{key}
                 python3 {cwd}/{input.script} {params.alloc} \
 {system} {replicate} {sys_tag} \
-{params.n_res} {params.n_atom} \
-{params.n_prot_at} {params.tot_res} \
+{n_res} {n_atom} \
+{n_prot_at} {tot_res} \
 {sys_tag}{fs}{prod1}-{prod2}.mdcrd {fs}""")
